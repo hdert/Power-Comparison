@@ -1,0 +1,5 @@
+data/
+config/*.env
+dev-environment/
+*.js
+__pycache__/
