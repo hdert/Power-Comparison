@@ -44,21 +44,18 @@ async def authenticate(config: ConfigParser, timeout: int = 60) -> ContactEnergy
 
     May modify config, so save config afterwards
     """
-    if not "token" in config["DEFAULT"]:
-        try:
-            async with async_timeout.timeout(timeout):
-                connector = await ContactEnergyApi.from_credentials(
-                    config["DEFAULT"]["email"], config["DEFAULT"]["password"]
-                )
-        except asyncio.TimeoutError as e:
-            raise e
-            # return  # TODO
-        except AuthException as e:
-            raise e
-            # return  # TODO
-        config.set("DEFAULT", "TOKEN", connector.token)
-    else:
-        connector = ContactEnergyApi.from_token(config["DEFAULT"]["token"])
+    try:
+        async with async_timeout.timeout(timeout):
+            connector = await ContactEnergyApi.from_credentials(
+                config["DEFAULT"]["email"], config["DEFAULT"]["password"]
+            )
+    except asyncio.TimeoutError as e:
+        raise e
+        # return  # TODO
+    except AuthException as e:
+        raise e
+        # return  # TODO
+    config.set("DEFAULT", "TOKEN", connector.token)
     if not "account_id" in config["DEFAULT"] or not "contract_id" in config["DEFAULT"]:
         await connector.account_summary()
         config.set("DEFAULT", "account_id", connector.account_id)
@@ -73,13 +70,14 @@ def get_start(
     connector: ContactEnergyApi,
     file_path: str,
     timeout: int = 60,
+    default_start: datetime.datetime = datetime.datetime(
+        year=datetime.date.today().year, month=1, day=1
+    ),
 ) -> datetime:
     if path.exists(file_path):
         with open(file_path, "r", newline="") as usage_file:
             reader = csv.reader(usage_file, delimiter=",")
-            start = [
-                str(datetime.date(year=datetime.date.today().year, month=1, day=1))
-            ]
+            start = [str(default_start.date())]
             for row in reader:
                 if len(row) > 0:
                     start = row
@@ -87,16 +85,20 @@ def get_start(
                 start[0], "%Y-%m-%d"
             ) + datetime.timedelta(days=1)
     else:
-        return datetime.datetime(year=datetime.date.today().year, month=1, day=1)
+        return default_start
 
 
 async def get_usage(
     connector: ContactEnergyApi,
     file_path: str = "data/usage_data.csv",
     timeout: int = 60,
+    default_start: datetime.datetime | None = None,
 ) -> None:
     """Retrieve energy usage from the API."""
-    start = get_start(connector, file_path, timeout)
+    if default_start is not None:
+        start = get_start(connector, file_path, timeout, default_start)
+    else:
+        start = get_start(connector, file_path, timeout)
     end = datetime.datetime.today()
     with open(file_path, "a") as usage_file:
         start_time = start
