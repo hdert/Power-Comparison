@@ -33,7 +33,10 @@ def save_configuration(
 ) -> None:
     """Save a config file to the filesystem."""
     with open(file_path, "w") as config_file:
+        token = config["DEFAULT"]["token"]
+        config.remove_option("DEFAULT", "token")
         config.write(config_file)
+        config.set("DEFAULT", "token", token)
 
 
 async def authenticate(config: ConfigParser, timeout: int = 60) -> ContactEnergyApi:
@@ -82,7 +85,7 @@ def get_start(
                     start = row
             return datetime.datetime.strptime(
                 start[0], "%Y-%m-%d"
-            ) + datetime.timedelta(hours=1)
+            ) + datetime.timedelta(days=1)
     else:
         return datetime.datetime(year=datetime.date.today().year, month=1, day=1)
 
