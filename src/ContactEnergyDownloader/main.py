@@ -4,7 +4,7 @@ from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
 from contact_energy_nz.consts import API_BASE_URL
 import asyncio, async_timeout
 from io import TextIOWrapper
-from sys import argv
+from sys import argv  # TODO
 from configparser import ConfigParser
 from os import path
 import datetime
@@ -74,12 +74,15 @@ def get_start(
     if path.exists(file_path):
         with open(file_path, "r", newline="") as usage_file:
             reader = csv.reader(usage_file, delimiter=",")
-            start = str(datetime.date(year=datetime.date.today().year, month=1, day=1))
+            start = [
+                str(datetime.date(year=datetime.date.today().year, month=1, day=1))
+            ]
             for row in reader:
-                start = row
-            return datetime.datetime.strptime(start, "%Y-%m-%d") + datetime.timedelta(
-                hours=1
-            )
+                if len(row) > 0:
+                    start = row
+            return datetime.datetime.strptime(
+                start[0], "%Y-%m-%d"
+            ) + datetime.timedelta(hours=1)
     else:
         return datetime.datetime(year=datetime.date.today().year, month=1, day=1)
 
@@ -106,7 +109,7 @@ async def get_usage(
 
 def save_data(data_file: TextIOWrapper, data: [UsageDatum]) -> None:
     """Helper function for get_usage to save data on the fly to the disk."""
-    if len(data) <= 0:
+    if data is None or len(data) <= 0:
         return
     data_file.write(str(data[0].date.date()))
     for hour in data:
@@ -127,11 +130,20 @@ async def get_usage_backend(
     formatted_end_date = end_date.strftime("%Y-%m-%d")
 
     url = f"{API_BASE_URL}/usage/v2/{connector.contract_id}?ba={connector.account_id}&interval=hourly&from={formatted_start_date}&to={formatted_end_date}"
+    # print(url)
     hourly_stats = await connector._try_fetch_data(url, "post")
+    # print(hourly_stats)
+    if type(hourly_stats) == dict and "message" in hourly_stats.keys():
+        print(f"failure: {hourly_stats}")
+        print(
+            f"connector.token: {connector.token}, connector.account_id: {connector.account_id}, connector.contract_id: {connector.contract_id}"
+        )
+        print(url)
+        return
     return sorted(
         [UsageDatum(item) for item in hourly_stats],
         key=lambda x: x.date,
-        reverse=True,
+        reverse=False,
     )
 
 
