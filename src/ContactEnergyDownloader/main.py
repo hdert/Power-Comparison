@@ -82,7 +82,7 @@ def get_start(
                 if len(row) > 0:
                     start = row
             return datetime.datetime.strptime(
-                start[0], "%Y-%m-%d"
+                start[0].strip(), "%Y-%m-%d"
             ) + datetime.timedelta(days=1)
     else:
         return default_start
