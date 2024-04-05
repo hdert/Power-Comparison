@@ -6,9 +6,12 @@ from os import path
 import numpy as np
 import calendar
 from io import TextIOWrapper
+import argparse
 
 
-def get_data(file_path: str) -> {int: [np.array]}:
+def get_data(
+    file_path: str, from_date: None | datetime.datetime = None
+) -> {int: [np.array]}:
     days_of_week = [i for i in range(7)]
     data = {i: [[] for i in range(24)] for i in days_of_week}
     with open(file_path, "r") as data_file:
@@ -19,7 +22,10 @@ def get_data(file_path: str) -> {int: [np.array]}:
                 file_header = False
                 continue
             header = False
-            day = datetime.date.fromisoformat(row[0].strip()).weekday()
+            date = datetime.date.fromisoformat(row[0].strip())
+            if from_date is not None and date < from_date:
+                continue
+            day = date.weekday()
             for i, value in enumerate(row):
                 if header == False:
                     header = True
@@ -56,7 +62,19 @@ def save_averages(file_path: str, data: {int: [int]}) -> None:
 def main() -> None:
     data_file_path = "data/usage_data.csv"
     analysis_file_path = "data/analysis.csv"
-    data = get_data(data_file_path)
+    parser = argparse.ArgumentParser(
+        prog="DataProcessor",
+        description="Generate averages for each hour of usage in a week",
+    )
+    parser.add_argument(
+        "-d",
+        "--from-date",
+        help="A date from which to calculate the averages in ISO format: 1970-01-01",
+    )
+    args = parser.parse_args()
+    if args.from_date is not None:
+        args.from_date = datetime.date.fromisoformat(args.from_date)
+    data = get_data(data_file_path, args.from_date)
     # for day, day_data in get_data(data_file_path).items():
     #     for hour_array in day_data:
     #         print(hour_array)
