@@ -55,7 +55,7 @@ def compare_plans(
 def print_comparison(data: [(str, float)]) -> None:
     """Pretty-print the comparison data."""
     for i, (name, cost) in enumerate(data):
-        print(f"#{i+1:3}: {cost:6.2f} ({name})")
+        print(f"#{i+1:3}: ${cost:6.2f} ({name})")
 
 
 def calculate_yearly_cost(
