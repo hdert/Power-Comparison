@@ -12,7 +12,11 @@ def get_data(file_path: str) -> {int: [np.array]}:
     data = {i: [[] for i in range(24)] for i in days_of_week}
     with open(file_path, "r") as data_file:
         reader = csv.reader(data_file, delimiter=",")
+        file_header = True
         for row in reader:
+            if file_header:
+                file_header = False
+                continue
             header = False
             day = datetime.date.fromisoformat(row[0].strip()).weekday()
             for i, value in enumerate(row):
