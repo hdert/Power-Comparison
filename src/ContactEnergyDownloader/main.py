@@ -88,6 +88,13 @@ def get_start(
         return default_start
 
 
+def write_header(file_path: str) -> None:
+    with open(file_path, "w") as usage_file:
+        usage_file.write(
+            "Date, 00, 01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23\n"
+        )
+
+
 async def get_usage(
     connector: ContactEnergyApi,
     file_path: str = "data/usage_data.csv",
@@ -99,6 +106,8 @@ async def get_usage(
         start = get_start(connector, file_path, timeout, default_start)
     else:
         start = get_start(connector, file_path, timeout)
+    if not path.exists(file_path):
+        write_header(file_path)
     end = datetime.datetime.today()
     with open(file_path, "a") as usage_file:
         start_time = start
