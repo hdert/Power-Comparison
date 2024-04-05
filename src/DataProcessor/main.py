@@ -60,27 +60,37 @@ def save_averages(file_path: str, data: {int: [int]}) -> None:
 
 
 def main() -> None:
-    data_file_path = "data/usage_data.csv"
-    analysis_file_path = "data/analysis.csv"
     parser = argparse.ArgumentParser(
         prog="DataProcessor",
-        description="Generate averages for each hour of usage in a week",
+        description="Generate averages for each hour of usage in a week.",
+    )
+    parser.add_argument(
+        "usage_file",
+        default="data/usage_data.csv",
+        help="The path to the file that contains your usage data.",
+        nargs="?",
+    )
+    parser.add_argument(
+        "analysis_file",
+        default="data/analysis.csv",
+        help="The path to where you want to output the analysis data.",
+        nargs="?",
     )
     parser.add_argument(
         "-d",
         "--from-date",
-        help="A date from which to calculate the averages in ISO format: 1970-01-01",
+        help="A date from which to calculate the averages in ISO format: 1970-01-01.",
     )
     args = parser.parse_args()
     if args.from_date is not None:
         args.from_date = datetime.date.fromisoformat(args.from_date)
-    data = get_data(data_file_path, args.from_date)
+    data = get_data(args.usage_file, args.from_date)
     # for day, day_data in get_data(data_file_path).items():
     #     for hour_array in day_data:
     #         print(hour_array)
     # print(construct_averages(data))
     averages = construct_averages(data)
-    save_averages(analysis_file_path, averages)
+    save_averages(args.analysis_file, averages)
 
 
 if __name__ == "__main__":
