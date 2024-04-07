@@ -59,6 +59,11 @@ def print_comparison(data: [(str, float)]) -> None:
         print(f"#{i+1:3}: ${cost:6.2f} ({name})")
 
 
+def calculate_kilowatts_used(usage_data: npt.NDArray) -> float:
+    """Calculate the amount of kilowatts used in a year for the usage data."""
+    return np.sum(usage_data) * (365 / 7)
+
+
 def calculate_yearly_cost(
     profile: (float, npt.NDArray), usage_data: npt.NDArray
 ) -> float:
@@ -89,6 +94,9 @@ def main() -> None:
     usage_data = get_analysis(args.analysis_file)
     profiles = get_profiles(args.profiles_dir)
     comparison_data = compare_plans(profiles, usage_data)
+    print(
+        f"For estimated electricity usage: {calculate_kilowatts_used(usage_data):.0f}kW"
+    )
     print_comparison(comparison_data)
 
 
