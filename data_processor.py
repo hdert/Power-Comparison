@@ -10,6 +10,7 @@ import argparse
 import DefaultValues
 
 
+# TODO: Refactor to use np nxn arrays and reader
 def get_data(
     file_path: str, from_date: None | datetime.datetime = None
 ) -> {int: [np.array]}:

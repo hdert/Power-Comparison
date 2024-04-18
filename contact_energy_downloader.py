@@ -1,10 +1,8 @@
 """Get energy usage API data from the Contact Energy API and save as CSV."""
 
 from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
-from contact_energy_nz.consts import API_BASE_URL
 import asyncio, async_timeout
 from io import TextIOWrapper
-from sys import argv  # TODO
 from configparser import ConfigParser
 from os import path
 import datetime

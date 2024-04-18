@@ -3,3 +3,4 @@ config/*.env
 dev-environment/
 *.js
 __pycache__/
+.venv/
