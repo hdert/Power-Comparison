@@ -7,7 +7,7 @@ import numpy as np
 import calendar
 from io import TextIOWrapper
 import argparse
-import DefaultValues
+import default_values
 
 
 # TODO: Refactor to use np nxn arrays and reader
@@ -68,13 +68,13 @@ def main() -> None:
     )
     parser.add_argument(
         "usage_file",
-        default=DefaultValues.usage_data_file_path,
+        default=default_values.usage_data_file_path,
         help="The path to the file that contains your usage data.",
         nargs="?",
     )
     parser.add_argument(
         "analysis_file",
-        default=DefaultValues.analysis_file_path,
+        default=default_values.analysis_file_path,
         help="The path to where you want to output the analysis data.",
         nargs="?",
     )

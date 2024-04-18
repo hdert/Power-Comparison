@@ -5,7 +5,7 @@ from numpy import typing as npt
 import os
 import csv
 import argparse
-import DefaultValues
+import default_values
 
 
 def get_analysis(file_path: str) -> npt.NDArray:
@@ -81,13 +81,13 @@ def main() -> None:
     )
     parser.add_argument(
         "analysis_file",
-        default=DefaultValues.analysis_file_path,
+        default=default_values.analysis_file_path,
         help="The path to the file that contains the analysis of your power usage.",
         nargs="?",
     )
     parser.add_argument(
         "profiles_dir",
-        default=DefaultValues.profiles_directory,
+        default=default_values.profiles_directory,
         help="The path to the directory that contains the profiles of the electricity providers that you want to compare.",
         nargs="?",
     )

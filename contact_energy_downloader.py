@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from os import path
 import datetime
 import csv
-import DefaultValues
+import default_values
 
 
 def get_configuration(file_path: str) -> ConfigParser:
@@ -129,10 +129,10 @@ def save_data(data_file: TextIOWrapper, data: [UsageDatum]) -> None:
 
 
 async def main() -> None:
-    config = get_configuration(DefaultValues.config_file_path)
+    config = get_configuration(default_values.config_file_path)
     connector = await authenticate(config)
-    save_configuration(config, DefaultValues.config_file_path)
-    await get_usage(connector, DefaultValues.usage_data_file_path)
+    save_configuration(config, default_values.config_file_path)
+    await get_usage(connector, default_values.usage_data_file_path)
 
 
 if __name__ == "__main__":
