@@ -7,6 +7,7 @@ import numpy as np
 import calendar
 from io import TextIOWrapper
 import argparse
+import DefaultValues
 
 
 def get_data(
@@ -66,13 +67,13 @@ def main() -> None:
     )
     parser.add_argument(
         "usage_file",
-        default="data/usage_data.csv",
+        default=DefaultValues.usage_data_file_path,
         help="The path to the file that contains your usage data.",
         nargs="?",
     )
     parser.add_argument(
         "analysis_file",
-        default="data/analysis.csv",
+        default=DefaultValues.analysis_file_path,
         help="The path to where you want to output the analysis data.",
         nargs="?",
     )

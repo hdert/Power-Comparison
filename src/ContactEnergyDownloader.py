@@ -9,9 +9,10 @@ from configparser import ConfigParser
 from os import path
 import datetime
 import csv
+import DefaultValues
 
 
-def get_configuration(file_path: str = "config/credentials.env") -> ConfigParser:
+def get_configuration(file_path: str) -> ConfigParser:
     """Get a configuration from the filesystem."""
     if not path.exists(file_path):
         raise FileNotFoundError(
@@ -28,9 +29,7 @@ def get_configuration(file_path: str = "config/credentials.env") -> ConfigParser
     return config
 
 
-def save_configuration(
-    config: ConfigParser, file_path: str = "config/credentials.env"
-) -> None:
+def save_configuration(config: ConfigParser, file_path: str) -> None:
     """Save a config file to the filesystem."""
     with open(file_path, "w") as config_file:
         token = config["DEFAULT"]["token"]
@@ -97,7 +96,7 @@ def write_header(file_path: str) -> None:
 
 async def get_usage(
     connector: ContactEnergyApi,
-    file_path: str = "data/usage_data.csv",
+    file_path: str,
     timeout: int = 60,
     default_start: datetime.datetime | None = None,
 ) -> None:
@@ -114,7 +113,7 @@ async def get_usage(
         while start_time < end:
             try:
                 async with async_timeout.timeout(timeout):
-                    data = await get_usage_backend(connector, start_time, start_time)
+                    data = await connector.get_hourly_usage(start_time)
             except asyncio.TimeoutError as e:
                 return  # TODO
             save_data(usage_file, data)
@@ -131,41 +130,11 @@ def save_data(data_file: TextIOWrapper, data: [UsageDatum]) -> None:
     data_file.write("\n")
 
 
-async def get_usage_backend(
-    connector: ContactEnergyApi, start_date: datetime, end_date: datetime
-):
-    """Query hourly usage stats for given range. Keep to a week max.
-
-    From https://github.com/tkhadimullin/contact-energy-nz/blob/master/contact_energy_nz/contact_energy_api.py
-    Parts may be corresponding license.
-    """
-
-    formatted_start_date = start_date.strftime("%Y-%m-%d")
-    formatted_end_date = end_date.strftime("%Y-%m-%d")
-
-    url = f"{API_BASE_URL}/usage/v2/{connector.contract_id}?ba={connector.account_id}&interval=hourly&from={formatted_start_date}&to={formatted_end_date}"
-    # print(url)
-    hourly_stats = await connector._try_fetch_data(url, "post")
-    # print(hourly_stats)
-    if type(hourly_stats) == dict and "message" in hourly_stats.keys():
-        print(f"failure: {hourly_stats}")
-        print(
-            f"connector.token: {connector.token}, connector.account_id: {connector.account_id}, connector.contract_id: {connector.contract_id}"
-        )
-        print(url)
-        return
-    return sorted(
-        [UsageDatum(item) for item in hourly_stats],
-        key=lambda x: x.date,
-        reverse=False,
-    )
-
-
 async def main() -> None:
-    config = get_configuration()
+    config = get_configuration(DefaultValues.config_file_path)
     connector = await authenticate(config)
-    save_configuration(config)
-    await get_usage(connector)
+    save_configuration(config, DefaultValues.config_file_path)
+    await get_usage(connector, DefaultValues.usage_data_file_path)
 
 
 if __name__ == "__main__":
