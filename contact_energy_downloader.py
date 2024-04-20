@@ -8,6 +8,7 @@ from os import path
 import datetime
 import csv
 import default_values
+import argparse
 
 
 def get_configuration(file_path: str) -> ConfigParser:
@@ -129,10 +130,31 @@ def save_data(data_file: TextIOWrapper, data: [UsageDatum]) -> None:
 
 
 async def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="Contact Energy Downloader",
+        description="Download usage data from the Contact Energy API.",
+    )
+    parser.add_argument(
+        "usage_file",
+        default=default_values.usage_data_file_path,
+        help="The path to the file that contains your usage data.",
+        nargs="?",
+    )
+    parser.add_argument(
+        "-d",
+        "--from-date",
+        help="The date you want to start downloading your data from if you\
+             do not already have any usage data",
+    )
+    args = parser.parse_args()
+    if args.from_date is not None:
+        args.from_date = datetime.datetime.fromisoformat(args.from_date)
     config = get_configuration(default_values.config_file_path)
     connector = await authenticate(config)
     save_configuration(config, default_values.config_file_path)
-    await get_usage(connector, default_values.usage_data_file_path)
+    await get_usage(
+        connector, default_values.usage_data_file_path, default_start=args.from_date
+    )
 
 
 if __name__ == "__main__":
