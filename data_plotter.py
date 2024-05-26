@@ -1,4 +1,4 @@
-"""Plot usage data using matplotlib."""
+"""Plot plan comparison data using matplotlib."""
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -9,7 +9,7 @@ import default_values
 
 
 def main():
-    """Plot usage data."""
+    """Plot plan comparison data."""
     usage_data = statistics_generator.get_analysis(default_values.analysis_file_path)
     profiles = statistics_generator.get_profiles(default_values.profiles_directory)
     comparison_data = statistics_generator.compare_plans(profiles, usage_data)
