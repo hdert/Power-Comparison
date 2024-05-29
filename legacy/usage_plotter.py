@@ -1,6 +1,5 @@
 """Plot usage data using matplotlib."""
 
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -10,7 +9,9 @@ import default_values
 
 def main():
     """Plot usage data."""
-    usage_data = statistics_generator.get_analysis(default_values.analysis_file_path)
+    usage_data = statistics_generator.get_analysis(
+        default_values.analysis_file_path
+    )
     usage_data = np.average(usage_data, axis=0)
     x_axis = [i for i in range(24)]
     axes = plt.subplot()
