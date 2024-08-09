@@ -1,0 +1,5 @@
+-   [ ] Graph plan pricing based on downloaded power usage
+-   [ ] Download power usage from provider (contact only currently)
+-   [ ] Update power usage from provider (contact only currently)
+-   [ ] Be able to estimate plan pricing while tweaking per hour usage values
+-   [ ] Download plan pricing automatically
