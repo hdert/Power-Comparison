@@ -1,10 +1,11 @@
 """Implement Connector for the Contact Energy API."""
 
 import asyncio
-from datetime import datetime, timedelta
+from datetime import timedelta, date
 from typing import Self
-import async_timeout
+from collections.abc import Callable
 from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
+import async_timeout
 from power_comparison.connector import Connector
 
 # from power_comparison.config import Config
@@ -46,23 +47,29 @@ class ContactEnergyConnector(Connector):
 
     async def retrieve_usage(
         self,
-        start_date: datetime | None = None,
-        end_date: datetime | None = None,
-    ) -> list[tuple[datetime, list[float]]]:
+        start_date: date | None = None,
+        end_date: date | None = None,
+        callback: Callable[[int], None] | None = None,
+    ) -> list[tuple[date, list[float]]]:
         """Retrieve usage data from the Connector's API.
 
         start_date:
             Default value is end_date - 365 days. Inclusive.
         end_date:
-            Default value is today. Inclusive."""
-        end_date = end_date if end_date else datetime.today()
+            Default value is today. Inclusive.
+        callback:
+            Default value is None. Callback accepts date ordinal for user
+            feedback while downloading data."""
+        end_date = end_date if end_date else date.today()
         start_date = (
             start_date if start_date else end_date - timedelta(days=365)
         )
-        data: list[tuple[datetime, list[UsageDatum]]] = []
+        data: list[list[UsageDatum]] = []
         valid_data = False
         day = end_date
         while day >= start_date:
+            if callback:
+                callback(day.toordinal())
             try:
                 async with async_timeout.timeout(self._timeout):
                     day_data = await self._connector.get_hourly_usage(day)
@@ -76,8 +83,11 @@ class ContactEnergyConnector(Connector):
                 raise e
             day -= timedelta(days=1)
         return [
-            (date, [usage_datum.value for usage_datum in usage_datums])
-            for date, usage_datums in data
+            (
+                usage_datums[0].date.date(),
+                [usage_datum.value for usage_datum in usage_datums],
+            )
+            for usage_datums in data
         ]
 
     @staticmethod
