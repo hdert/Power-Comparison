@@ -1,6 +1,6 @@
 """A graphical application to interact with your power usage statistics."""
 
-from tkinter import Tk
+from tkinter import Tk, messagebox
 from tkinter import ttk
 import tkinter as tk
 
@@ -54,7 +54,7 @@ class LoginScreen:
     """Define the Login or Registration selection screen."""
 
     _app: View
-    _selected_connector: tk.StringVar
+    _selected_connector: ttk.Combobox
     _username: tk.StringVar
     _password: tk.StringVar
 
@@ -67,20 +67,24 @@ class LoginScreen:
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
+        self._app.set_title("Power Comparison: Login")
         frame = self._app.new_frame()
         frame.grid()
         self._app.config_grid(frame, [1, 1, 1, 1], [1, 2])
-        self._selected_connector = tk.StringVar()
-        ttk.Label(frame, text="Power Company").grid(row=0, column=0)
-        ttk.Combobox(
+        ttk.Label(frame, text="Power Company:").grid(
+            row=0, column=0, sticky="E"
+        )
+        self._selected_connector = ttk.Combobox(
             frame,
-            textvariable=self._selected_connector,
             values=self._app.get_controller().get_connector_names(),
-        ).grid(row=0, column=1)
-        ttk.Label(frame, text="Username/Email").grid(row=1, column=0)
+        )
+        self._selected_connector.grid(row=0, column=1)
+        ttk.Label(frame, text="Username/Email:").grid(
+            row=1, column=0, sticky="E"
+        )
         self._username = tk.StringVar()
         ttk.Entry(frame, textvariable=self._username).grid(row=1, column=1)
-        ttk.Label(frame, text="Password").grid(row=2, column=0)
+        ttk.Label(frame, text="Password:").grid(row=2, column=0, sticky="E")
         self._password = tk.StringVar()
         ttk.Entry(frame, show="•", textvariable=self._password).grid(
             row=2, column=1
@@ -92,14 +96,51 @@ class LoginScreen:
 
     def _next_clicked(self) -> None:
         """Event handler for the next button being clicked."""
-        if self._app.get_controller().try_connect(
+        result = self._app.get_controller().try_connect(
             self._selected_connector.get(),
             self._username.get(),
             self._password.get(),
-        ):
-            print("Success!")
-        else:
-            print("Fail!")
+        )
+        if result is not None:
+            messagebox.showerror(title=result[0], message=result[1])
+            return
+        DataDownloadScreen(self._app)
+
+    # def _loading_window(self) -> Callable[..., None]:
+    #     """Create a loading window."""
+    #     loading_window = tk.Toplevel()
+    #     loading_window.title("Downloading user data.")
+    #     ttk.Label(
+    #         loading_window,
+    #         text="Downloading user data, this may take a while.",
+    #     ).grid(row=0, column=0)
+    #     return loading_window.destroy
+
+
+class DataDownloadScreen:
+    """Define the Data Download screen."""
+
+    _app: View
+    _message: tk.StringVar
+
+    def __init__(self, app: View):
+        self._app = app
+        self.tk_init()
+        self._app.get_controller.download_data()
+
+    def tk_init(self) -> None:
+        """Initialize Tkinter for this screen."""
+        self._app.set_title("Power Comparison: Downloading Data")
+        frame = self._app.new_frame()
+        frame.grid()
+        self._app.config_grid(frame, [1], [1])
+        self._message = tk.StringVar()
+        ttk.Label(frame, textvariable=self._message).grid(row=0, column=0)
+        self._app.set_padding(frame, 5, 5)
+
+    def update_message(self, message: str) -> None:
+        """Update message for user feedback on download."""
+        self._message.set(message)
 
 
 class DataViewScreen:
@@ -116,4 +157,4 @@ class DataViewScreen:
 
 
 if __name__ == "__main__":
-    View()
+    View(Controller())
