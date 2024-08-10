@@ -12,11 +12,25 @@ class DefaultValuesUtility:
     _ANALYSIS_FILE_PATH = "data/analysis.csv"
     _USAGE_DATA_FILE_PATH = "data/usage_data.csv"
     _CONFIG_FILE_PATH = "config/credentials.env"
+    _DB_FILE_PATH = "data/user_data.db"
+
+    @staticmethod
+    def create_dirs(dirpath: str) -> None:
+        """Ensure all directories in dirpath are created."""
+        Path(dirpath).mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def get_profiles_dir() -> str:
         """Return a path to the profiles directory."""
         return DefaultValuesUtility._PROFILES_DIR
+
+    @staticmethod
+    def get_db_file_path() -> str:
+        """Return a path to the database file."""
+        return (
+            DefaultValuesUtility._PREFIX_DIR
+            + DefaultValuesUtility._DB_FILE_PATH
+        )
 
     @staticmethod
     def get_analysis_file_path(username: str) -> str:
