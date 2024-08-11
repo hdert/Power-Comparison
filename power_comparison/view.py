@@ -2,7 +2,9 @@
 
 from tkinter import Tk, messagebox
 from tkinter import ttk
+from typing import Self
 import tkinter as tk
+import asyncio
 
 from .controller import Controller
 
@@ -13,15 +15,18 @@ class View:
     _root: Tk
     _controller: Controller
 
-    def __init__(self, controller: Controller) -> None:
+    @classmethod
+    async def create(cls, controller: Controller) -> Self:
         """Initialize the App."""
+        self = cls()
         self._controller = controller
         self._root = Tk()
         self._root.minsize(width=1280, height=720)
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
-        LoginScreen(self)
+        await LoginScreen.create(self)
         self._root.mainloop()
+        return self
 
     def config_grid(
         self, frame: ttk.Frame, rows: list[int], columns: list[int]
@@ -38,7 +43,10 @@ class View:
 
     def new_frame(self) -> ttk.Frame:
         """Return a new frame."""
-        return ttk.Frame(self._root)
+        frame = ttk.Frame(self._root)
+        frame.grid()
+        frame.tkraise()
+        return frame
 
     def set_padding(self, frame: ttk.Frame, padx: int, pady: int) -> None:
         """Set the padding of all children in a frame."""
@@ -49,6 +57,18 @@ class View:
         """Return the controller."""
         return self._controller
 
+    async def launch_data_download(self) -> None:
+        """Launch data download screen."""
+        await DataDownloadScreen.create(self)
+
+    def clear_screen(self) -> None:
+        """Clear screen."""
+        for child in self._root.winfo_children():
+            child.destroy()
+
+    def close(self) -> None:
+        self._controller.close()
+
 
 class LoginScreen:
     """Define the Login or Registration selection screen."""
@@ -58,18 +78,17 @@ class LoginScreen:
     _username: tk.StringVar
     _password: tk.StringVar
 
-    def __init__(self, app: View) -> None:
+    @classmethod
+    async def create(cls, app: View) -> None:
+        """Create LoginScreen."""
+        self = cls()
         self._app = app
-        self.tk_init()
-        # self._selected_connector = None
-        # self._username = None
-        # self._password = None
+        await self.tk_init()
 
-    def tk_init(self) -> None:
+    async def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Login")
         frame = self._app.new_frame()
-        frame.grid()
         self._app.config_grid(frame, [1, 1, 1, 1], [1, 2])
         ttk.Label(frame, text="Power Company:").grid(
             row=0, column=0, sticky="E"
@@ -89,14 +108,18 @@ class LoginScreen:
         ttk.Entry(frame, show="•", textvariable=self._password).grid(
             row=2, column=1
         )
-        ttk.Button(frame, text="Login", command=self._next_clicked).grid(
-            row=3, column=1, sticky="E"
-        )
+        ttk.Button(
+            frame,
+            text="Login",
+            command=lambda: asyncio.get_event_loop().create_task(
+                self._next_clicked()
+            ),
+        ).grid(row=3, column=1, sticky="E")
         self._app.set_padding(frame, 5, 5)
 
-    def _next_clicked(self) -> None:
+    async def _next_clicked(self) -> None:
         """Event handler for the next button being clicked."""
-        result = self._app.get_controller().try_connect(
+        result = await self._app.get_controller().try_connect(
             self._selected_connector.get(),
             self._username.get(),
             self._password.get(),
@@ -104,17 +127,7 @@ class LoginScreen:
         if result is not None:
             messagebox.showerror(title=result[0], message=result[1])
             return
-        DataDownloadScreen(self._app)
-
-    # def _loading_window(self) -> Callable[..., None]:
-    #     """Create a loading window."""
-    #     loading_window = tk.Toplevel()
-    #     loading_window.title("Downloading user data.")
-    #     ttk.Label(
-    #         loading_window,
-    #         text="Downloading user data, this may take a while.",
-    #     ).grid(row=0, column=0)
-    #     return loading_window.destroy
+        asyncio.create_task(self._app.launch_data_download())
 
 
 class DataDownloadScreen:
@@ -123,18 +136,25 @@ class DataDownloadScreen:
     _app: View
     _message: tk.StringVar
 
-    def __init__(self, app: View):
+    @classmethod
+    async def create(cls, app: View) -> None:
+        """Create DataDownloadScreen."""
+        self = cls()
         self._app = app
         self.tk_init()
-        self._app.get_controller.download_data()
+        asyncio.create_task(
+            self._app.get_controller().download_data(self.update_message)
+        )
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Downloading Data")
+        self._app.clear_screen()
         frame = self._app.new_frame()
         frame.grid()
         self._app.config_grid(frame, [1], [1])
         self._message = tk.StringVar()
+        self._message.set("Downloading data")
         ttk.Label(frame, textvariable=self._message).grid(row=0, column=0)
         self._app.set_padding(frame, 5, 5)
 
