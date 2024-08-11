@@ -15,9 +15,12 @@ class DefaultValuesUtility:
     _DB_FILE_PATH = "data/user_data.db"
 
     @staticmethod
-    def create_dirs(dirpath: str) -> None:
+    def create_dirs(dirpath: str, filepath: bool = False) -> None:
         """Ensure all directories in dirpath are created."""
-        Path(dirpath).mkdir(parents=True, exist_ok=True)
+        if filepath:
+            Path(dirpath).parent.mkdir(parents=True, exist_ok=True)
+        else:
+            Path(dirpath).mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def get_profiles_dir() -> str:
