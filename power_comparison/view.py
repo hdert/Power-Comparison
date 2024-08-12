@@ -3,6 +3,7 @@
 from tkinter import Tk, messagebox
 from tkinter import ttk
 import tkinter as tk
+import asyncio
 
 from .controller import Controller
 
@@ -21,7 +22,14 @@ class View:
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
         LoginScreen(self)
-        self._root.mainloop()
+        asyncio.get_event_loop().create_task(self.exec(1 / 20))
+        asyncio.get_event_loop().run_forever()
+
+    async def exec(self, interval: float) -> None:
+        """Execute view."""
+        while True:
+            self._root.update()
+            await asyncio.sleep(interval)
 
     def config_grid(
         self, frame: ttk.Frame, rows: list[int], columns: list[int]
@@ -39,7 +47,8 @@ class View:
     def new_frame(self) -> ttk.Frame:
         """Return a new frame."""
         frame = ttk.Frame(self._root)
-        frame.grid()
+        frame.grid(row=0, column=0, sticky="NEWS")
+        self.config_grid(frame, [1], [1])
         frame.tkraise()
         return frame
 
@@ -55,14 +64,6 @@ class View:
     def launch_data_download(self) -> None:
         """Launch data download screen."""
         DataDownloadScreen(self)
-
-    def clear_screen(self) -> None:
-        """Clear screen."""
-        for child in self._root.winfo_children():
-            child.destroy()
-
-    def close(self) -> None:
-        self._controller.close()
 
 
 class LoginScreen:
@@ -81,8 +82,9 @@ class LoginScreen:
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Login")
-        self._app.clear_screen()
-        frame = self._app.new_frame()
+        window_root = self._app.new_frame()
+        frame = ttk.Frame(window_root)
+        frame.grid()
         self._app.config_grid(frame, [1, 1, 1, 1], [1, 2])
         ttk.Label(frame, text="Power Company:").grid(
             row=0, column=0, sticky="E"
@@ -135,8 +137,8 @@ class DataDownloadScreen:
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Downloading Data")
-        self._app.clear_screen()
-        frame = self._app.new_frame()
+        window_root = self._app.new_frame()
+        frame = ttk.Frame(window_root)
         frame.grid()
         self._app.config_grid(frame, [1], [1])
         self._message = tk.StringVar()
@@ -160,7 +162,3 @@ class DataViewScreen:
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
-
-
-if __name__ == "__main__":
-    View(Controller())

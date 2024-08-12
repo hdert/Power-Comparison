@@ -66,20 +66,30 @@ class Controller:
         """Download user data."""
         if self._connector is None:
             return False
-        if self._data is None:
-            return False
         self._callback = callback
-        try:
-            data = asyncio.run(
-                self._connector.retrieve_usage(
-                    start_date=self._data.get_last_date(),
-                    callback=self.user_feedback_callback,
-                )
-            )
-        except asyncio.TimeoutError:
-            return False
-        self._data.ingest_data(data)
+        asyncio.get_event_loop().create_task(
+            self.counter(self.user_feedback_callback)
+        )
+        # try:
+        #     data = asyncio.run(
+        #         self._connector.retrieve_usage(
+        #             start_date=self._data.get_last_date(),
+        #             callback=self.user_feedback_callback,
+        #         )
+        #     )
+        # except asyncio.TimeoutError:
+        #     return False
+        # self._data.ingest_data(data)
         return True
+
+    async def counter(self, callback: Callable[[int], None]) -> None:
+        """Count."""
+        i = 1
+        while True:
+            callback(i)
+            print(i)
+            i += 1
+            await asyncio.sleep(1)
 
     def user_feedback_callback(self, date_ordinal: int) -> None:
         """Accept a date ordinal to callback stored callback with str."""
@@ -87,6 +97,6 @@ class Controller:
             return
         self._callback(
             "Retrieving usage data for date: {}".format(
-                date.fromordinal(date_ordinal).strftime("%x")
+                date.fromordinal(date_ordinal).strftime("%Y-%m-%d")
             )
         )
