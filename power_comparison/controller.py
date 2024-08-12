@@ -24,7 +24,7 @@ class Controller:
         """Return the names of the connectors."""
         return list(Connectors.get_names().keys())
 
-    async def try_connect(
+    def try_connect(
         self, connector_name: str, username: str, password: str
     ) -> None | tuple[str, str]:
         """Try connecting and authenticating with a connector.
@@ -44,9 +44,11 @@ class Controller:
         if password.strip() == "":
             return "No password", "You haven't entered a password."
         try:
-            self._connector = await Connectors.get_names()[
-                connector_name
-            ].create(username, password)
+            self._connector = asyncio.run(
+                Connectors.get_names()[connector_name].create(
+                    username, password
+                )
+            )
         except (AuthException, asyncio.TimeoutError):
             return (
                 "Invalid login",
@@ -55,7 +57,7 @@ class Controller:
         self._data = Data(username)
         return None
 
-    async def download_data(
+    def download_data(
         self, callback: Callable[[str], None] | None = None
     ) -> bool:
         """Download user data."""
@@ -65,9 +67,11 @@ class Controller:
             return False
         self._callback = callback
         try:
-            data = await self._connector.retrieve_usage(
-                start_date=self._data.get_last_date(),
-                callback=self.user_feedback_callback,
+            data = asyncio.run(
+                self._connector.retrieve_usage(
+                    start_date=self._data.get_last_date(),
+                    callback=self.user_feedback_callback,
+                )
             )
         except asyncio.TimeoutError:
             return False
