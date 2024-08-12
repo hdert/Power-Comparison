@@ -3,25 +3,36 @@
 import sqlite3
 from datetime import date, timedelta
 from .default_values_utility import DefaultValuesUtility as DVU
+from typing import Self
 
 
 class Data:
     """Hold usage data, and manipulation tools."""
 
-    _username: str
-    _user_id: int
+    _username: str | None = None
+    _user_id: int | None = None
 
-    def __init__(self, username: str) -> None:
-        """Initialize the Data object."""
+    def __init__(self) -> None:
+        """Initialize the Data object without a user.
+
+        To properly initialize with a user, call initialize_user().
+        """
         db_filepath = DVU.get_db_file_path()
         DVU.create_dirs(db_filepath, filepath=True)
-        self._username = username
         self.connection = sqlite3.connect(db_filepath)
         self.cursor = self.connection.cursor()
         self.initialize_database()
 
-    def initialize_user(self) -> None:
-        """Ensure user is initialized."""
+    @classmethod
+    def from_username(cls, username: str) -> Self:
+        """Initialize a Data object from a username."""
+        self = cls()
+        self.initialize_user(username)
+        return self
+
+    def initialize_user(self, username: str) -> None:
+        """Ensure the user `username` is initialized."""
+        self._username = username
         result = self.cursor.execute(
             "SELECT username_email FROM user_data WHERE username_email=?",
             (self._username,),
@@ -40,6 +51,7 @@ class Data:
             (self._username,),
         )
         self._user_id = result.fetchone()[0]
+        self.connection.commit()
 
     def initialize_database(self) -> None:
         """Ensure database is initialized and table and user exist."""
@@ -52,7 +64,7 @@ class Data:
             self.cursor.execute(
                 """CREATE TABLE
                 user_data(
-                user_id PRIMARY KEY,
+                user_id INTEGER PRIMARY KEY,
                 username_email TEXT
                 )"""
             )
@@ -70,11 +82,12 @@ class Data:
                 )"""
             )
         finally:
-            self.initialize_user()
             self.connection.commit()
 
     def get_last_date(self) -> date | None:
         """Return usage data date, or None."""
+        if self._user_id is None:
+            raise ValueError("Data: _user_id not set")
         result = self.cursor.execute(
             """SELECT date
             FROM usage_data
@@ -90,6 +103,8 @@ class Data:
 
     def ingest_data(self, data: list[tuple[date, list[float]]]) -> None:
         """Ingest data."""
+        if self._user_id is None:
+            raise ValueError("Data: _user_id not set")
         for data_date, values in data:
             data_date_ord = data_date.toordinal()
             day = data_date.weekday()
@@ -111,6 +126,8 @@ class Data:
             Defaults to one year ago. The first date to include.
         end_date:
             Defaults to today. The last date to include."""
+        if self._user_id is None:
+            raise ValueError("Data: _user_id not set")
         if end_date is None:
             end_date = date.today()
         if start_date is None:
@@ -143,6 +160,8 @@ class Data:
             Defaults to one year ago. The first date to include.
         end_date:
             Defaults to today. The last date to include."""
+        if self._user_id is None:
+            raise ValueError("Data: _user_id not set")
         if end_date is None:
             end_date = date.today()
         if start_date is None:

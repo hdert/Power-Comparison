@@ -6,19 +6,22 @@ import asyncio
 from collections.abc import Callable
 from datetime import date
 from contact_energy_nz import AuthException
-from . import Connectors, Data
+from .connectors import Connectors
 from .connector import Connector
+from .data import Data
 
 
 class Controller:
     """A class to control the application."""
 
     _connector: Connector | None = None
-    _data: Data | None = None
+    _data: Data
     _callback: Callable[[str], None] | None = None
+    _username: str | None = None
 
-    def __init__(self) -> None:
+    def __init__(self, data: Data) -> None:
         """Initialize the controller."""
+        self._data = data
 
     def get_connector_names(self) -> list[str]:
         """Return the names of the connectors."""
@@ -54,7 +57,7 @@ class Controller:
                 "Invalid login",
                 "Your username/email and/or your password are incorrect.",
             )
-        self._data = Data(username)
+        self._data.initialize_user(username)
         return None
 
     def download_data(
@@ -87,8 +90,3 @@ class Controller:
                 date.fromordinal(date_ordinal).strftime("%x")
             )
         )
-
-    def close(self) -> None:
-        """Close controller."""
-        if self._data:
-            self._data.close()
