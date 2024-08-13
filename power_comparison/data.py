@@ -1,6 +1,7 @@
 """Define the Data class."""
 
 import sqlite3
+import numpy as np
 from datetime import date, timedelta
 from .default_values_utility import DefaultValuesUtility as DVU
 from typing import Self
@@ -189,11 +190,6 @@ class Data:
 class Profiles:
     """Hold profile data and tools."""
 
-    _profile_path: str | None = None
-
-    def __init__(self) -> None:
-        """Initialize Profiles without a profile set."""
-
     @staticmethod
     def get_profile_set_names() -> list[str]:
         """Return a list of names of profile sets."""
@@ -202,3 +198,27 @@ class Profiles:
             for x in Path(DVU.get_profiles_dir()).iterdir()
             if x.is_dir()
         ]
+
+    @staticmethod
+    def get_profile_data(profile: str) -> list[list[list[float]]] | None:
+        """Return a list of profile data lists, or None if not valid path.
+
+        A profile data list is nested list of day, followed by hour.
+        A profile data list should be size (7,24)."""
+        data = []
+        path = Path(DVU.get_profiles_dir()) / profile
+        if not path.exists():
+            return None
+        for data_path in path.iterdir():
+            if data_path.is_file():
+                data.append(
+                    np.loadtxt(
+                        str(data_path),
+                        dtype=float,
+                        delimiter=",",
+                        skiprows=1,
+                        usecols=range(1, 25),
+                        max_rows=7,
+                    ).tolist()
+                )
+        return data
