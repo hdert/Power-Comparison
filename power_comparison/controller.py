@@ -10,6 +10,9 @@ from .connectors import Connectors
 from .connector import Connector
 from .data import Data
 
+# Temporary
+import matplotlib.pyplot as plt
+
 
 class Controller:
     """A class to control the application."""
@@ -102,3 +105,18 @@ class Controller:
             return
         display_date = date.fromordinal(date_ordinal).strftime("%Y-%m-%d")
         self._callback(f"Retrieving usage data for date: {display_date}")
+
+    def show_data(self) -> None:
+        """Show data in matplotlib displays."""
+        usage_data = self._data.get_usage_per_weekday()
+        if usage_data is None:
+            raise ValueError("No usage data found")
+        x_axis = [i for i in range(24)]
+        axes = plt.subplot()
+        axes.set_xticks(x_axis)
+        axes.set_title("Average Power Usage Per Hour")
+        axes.set_xlabel("Hour of day")
+        axes.set_ylabel("Power Usage in KWh")
+        axes.grid(True, "both", "y")
+        plt.bar(x_axis, usage_data)
+        plt.show()

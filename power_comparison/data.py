@@ -138,7 +138,7 @@ class Data:
             WHERE user_id = ?
             AND date > ?
             AND date < ?
-            GROUP BY (day, hour)
+            GROUP BY day, hour
             ORDER BY day ASC, hour ASC""",
             (self._user_id, start_date.toordinal(), end_date.toordinal()),
         )

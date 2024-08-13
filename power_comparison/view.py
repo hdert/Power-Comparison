@@ -186,5 +186,10 @@ class DataViewScreen:
         window_root = self._app.new_frame()
         frame = ttk.Frame(window_root)
         frame.grid()
-        self._app.config_grid(frame, [1], [1])
-        ttk.Label(frame, text="Data goes here").grid()
+        self._app.config_grid(frame, [1, 1], [1])
+        ttk.Label(frame, text="Data goes here").grid(row=0, column=0)
+        ttk.Button(
+            frame,
+            text="Click for data",
+            command=self._app.get_controller().show_data,
+        ).grid(row=1, column=0)
