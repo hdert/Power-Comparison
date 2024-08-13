@@ -13,6 +13,7 @@ class View:
 
     _root: Tk
     _controller: Controller
+    _closed: bool = False
 
     def __init__(self, controller: Controller) -> None:
         """Initialize the App."""
@@ -21,13 +22,21 @@ class View:
         self._root.minsize(width=1280, height=720)
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
+        self._root.protocol("WM_DELETE_WINDOW", self.close_view)
         LoginScreen(self)
-        asyncio.get_event_loop().create_task(self.exec(1 / 20))
-        asyncio.get_event_loop().run_forever()
+        task = asyncio.get_event_loop().create_task(self.exec(1 / 20))
+        asyncio.get_event_loop().run_until_complete(task)
+
+    def close_view(self) -> None:
+        """Close view."""
+        self._root.destroy()
+        self._closed = True
 
     async def exec(self, interval: float) -> None:
         """Execute view."""
         while True:
+            if self._closed:
+                break
             self._root.update()
             await asyncio.sleep(interval)
 

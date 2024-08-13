@@ -36,8 +36,13 @@ class Controller:
         """
         if connector_name == "":
             return (
-                "No Power Utility Selected.",
+                "No Power Utility Selected",
                 "You haven't selected a power utility to connect to.",
+            )
+        if connector_name not in Connectors.get_names():
+            return (
+                "Invalid Power Utility Selected",
+                "You haven't selected a valid power utility to connect to.",
             )
         if username.strip() == "":
             return (
@@ -95,8 +100,5 @@ class Controller:
         """Accept a date ordinal to callback stored callback with str."""
         if self._callback is None:
             return
-        self._callback(
-            "Retrieving usage data for date: {}".format(
-                date.fromordinal(date_ordinal).strftime("%Y-%m-%d")
-            )
-        )
+        display_date = date.fromordinal(date_ordinal).strftime("%Y-%m-%d")
+        self._callback(f"Retrieving usage data for date: {display_date}")
