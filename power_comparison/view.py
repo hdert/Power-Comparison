@@ -74,6 +74,10 @@ class View:
         """Launch data download screen."""
         DataDownloadScreen(self)
 
+    def launch_data_view_screen(self) -> None:
+        """Launch data view screen."""
+        DataViewScreen(self)
+
 
 class LoginScreen:
     """Define the Login or Registration selection screen."""
@@ -113,20 +117,25 @@ class LoginScreen:
         ttk.Entry(frame, show="•", textvariable=self._password).grid(
             row=2, column=1
         )
-        ttk.Button(frame, text="Login", command=self._next_clicked).grid(
-            row=3, column=1, sticky="E"
+        self._next_button = ttk.Button(
+            frame,
+            text="Login",
+            command=lambda: asyncio.create_task(self.next_clicked()),
         )
+        self._next_button.grid(row=3, column=1, sticky="E")
         self._app.set_padding(frame, 5, 5)
 
-    def _next_clicked(self) -> None:
+    async def next_clicked(self) -> None:
         """Event handler for the next button being clicked."""
-        result = self._app.get_controller().try_connect(
+        self._next_button.config(state="disabled")
+        result = await self._app.get_controller().try_connect(
             self._selected_connector.get(),
             self._username.get(),
             self._password.get(),
         )
         if result is not None:
             messagebox.showerror(title=result[0], message=result[1])
+            self._next_button.config(state="normal")
             return
         self._app.launch_data_download()
 
@@ -141,7 +150,9 @@ class DataDownloadScreen:
         """Create DataDownloadScreen."""
         self._app = app
         self.tk_init()
-        self._app.get_controller().download_data(self.update_message)
+        self._app.get_controller().download_data(
+            self._app.launch_data_view_screen, self.update_message
+        )
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
@@ -171,3 +182,9 @@ class DataViewScreen:
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
+        self._app.set_title("Power Comparison: Analytics")
+        window_root = self._app.new_frame()
+        frame = ttk.Frame(window_root)
+        frame.grid()
+        self._app.config_grid(frame, [1], [1])
+        ttk.Label(frame, text="Data goes here").grid()

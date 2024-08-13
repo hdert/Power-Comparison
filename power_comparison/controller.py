@@ -4,7 +4,7 @@ import asyncio
 
 # from .view import View
 from collections.abc import Callable
-from datetime import date
+from datetime import date, timedelta
 from contact_energy_nz import AuthException
 from .connectors import Connectors
 from .connector import Connector
@@ -27,7 +27,7 @@ class Controller:
         """Return the names of the connectors."""
         return list(Connectors.get_names().keys())
 
-    def try_connect(
+    async def try_connect(
         self, connector_name: str, username: str, password: str
     ) -> None | tuple[str, str]:
         """Try connecting and authenticating with a connector.
@@ -52,11 +52,9 @@ class Controller:
         if password.strip() == "":
             return "No password", "You haven't entered a password."
         try:
-            self._connector = asyncio.run(
-                Connectors.get_names()[connector_name].create(
-                    username, password
-                )
-            )
+            self._connector = await Connectors.get_names()[
+                connector_name
+            ].create(username, password)
         except (AuthException, asyncio.TimeoutError):
             return (
                 "Invalid login",
@@ -66,35 +64,37 @@ class Controller:
         return None
 
     def download_data(
-        self, callback: Callable[[str], None] | None = None
-    ) -> bool:
+        self,
+        finished_callback: Callable[[], None],
+        callback: Callable[[str], None] | None = None,
+    ) -> None:
         """Download user data."""
-        if self._connector is None:
-            return False
         self._callback = callback
         asyncio.get_event_loop().create_task(
-            self.counter(self.user_feedback_callback)
+            self.data_download_call(finished_callback)
         )
-        # try:
-        #     data = asyncio.run(
-        #         self._connector.retrieve_usage(
-        #             start_date=self._data.get_last_date(),
-        #             callback=self.user_feedback_callback,
-        #         )
-        #     )
-        # except asyncio.TimeoutError:
-        #     return False
-        # self._data.ingest_data(data)
-        return True
 
-    async def counter(self, callback: Callable[[int], None]) -> None:
-        """Count."""
-        i = 1
-        while True:
-            callback(i)
-            print(i)
-            i += 1
-            await asyncio.sleep(1)
+    async def data_download_call(
+        self, finished_callback: Callable[[], None]
+    ) -> None:
+        """Call and await's connectors retrieve usage."""
+        if self._connector is None:
+            raise ValueError("Controller._connector not set")
+        start_date = self._data.get_last_date()
+        if start_date:
+            start_date += timedelta(days=1)
+        try:
+            data = await self._connector.retrieve_usage(
+                start_date=start_date,
+                callback=self.user_feedback_callback,
+            )
+        except asyncio.TimeoutError:
+            if self._callback:
+                self._callback("Error: Downloading date timed out")
+        if self._callback is not None:
+            self._callback("Saving downloaded data")
+        self._data.ingest_data(data)
+        finished_callback()
 
     def user_feedback_callback(self, date_ordinal: int) -> None:
         """Accept a date ordinal to callback stored callback with str."""

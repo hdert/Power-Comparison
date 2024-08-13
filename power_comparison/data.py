@@ -34,7 +34,7 @@ class Data:
         """Ensure the user `username` is initialized."""
         self._username = username
         result = self.cursor.execute(
-            "SELECT username_email FROM user_data WHERE username_email=?",
+            "SELECT user_id FROM user_data WHERE username_email=?",
             (self._username,),
         )
         row = result.fetchone()
@@ -109,7 +109,7 @@ class Data:
             data_date_ord = data_date.toordinal()
             day = data_date.weekday()
             self.cursor.executemany(
-                """INSERT INTO usage_data VALUES(?)""",
+                """INSERT INTO usage_data VALUES(?, ?, ?, ?, ?)""",
                 (
                     (self._user_id, data_date_ord, day, hour, value)
                     for hour, value in enumerate(values)
