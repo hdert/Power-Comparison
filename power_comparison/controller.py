@@ -111,7 +111,7 @@ class Controller:
         usage_data = self._data.get_usage_per_weekday()
         if usage_data is None:
             raise ValueError("No usage data found")
-        x_axis = [i for i in range(24)]
+        x_axis = list(range(24))
         axes = plt.subplot()
         axes.set_xticks(x_axis)
         axes.set_title("Average Power Usage Per Hour")
@@ -120,3 +120,6 @@ class Controller:
         axes.grid(True, "both", "y")
         plt.bar(x_axis, usage_data)
         plt.show()
+
+    def show_comparison_data(self) -> None:
+        """Show comparison data in matplotlib display."""

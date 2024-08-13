@@ -4,6 +4,7 @@ import sqlite3
 from datetime import date, timedelta
 from .default_values_utility import DefaultValuesUtility as DVU
 from typing import Self
+from pathlib import Path
 
 
 class Data:
@@ -183,3 +184,21 @@ class Data:
         """Close Data."""
         self.connection.commit()
         self.connection.close()
+
+
+class Profiles:
+    """Hold profile data and tools."""
+
+    _profile_path: str | None = None
+
+    def __init__(self) -> None:
+        """Initialize Profiles without a profile set."""
+
+    @staticmethod
+    def get_profile_set_names() -> list[str]:
+        """Return a list of names of profile sets."""
+        return [
+            x.name
+            for x in Path(DVU.get_profiles_dir()).iterdir()
+            if x.is_dir()
+        ]
