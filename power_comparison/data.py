@@ -190,8 +190,10 @@ class Data:
 class Profiles:
     """Hold profile data and tools."""
 
-    @staticmethod
-    def get_profile_set_names() -> list[str]:
+    def __init__(self) -> None:
+        """Initialize a Profiles."""
+
+    def get_profile_set_names(self) -> list[str]:
         """Return a list of names of profile sets."""
         return [
             x.name
@@ -199,8 +201,7 @@ class Profiles:
             if x.is_dir()
         ]
 
-    @staticmethod
-    def get_profile_data(profile: str) -> list[list[list[float]]] | None:
+    def get_profile_data(self, profile: str) -> list[list[list[float]]] | None:
         """Return a list of profile data lists, or None if not valid path.
 
         A profile data list is nested list of day, followed by hour.
