@@ -2,12 +2,13 @@
 
 from .view import View
 from .controller import Controller
-from .data import Data
+from .data import Data, Profiles
 
 
 class App:
     def __init__(self) -> None:
         data = Data()
-        controller = Controller(data)
+        profiles = Profiles()
+        controller = Controller(data, profiles)
         View(controller)
         data.close()

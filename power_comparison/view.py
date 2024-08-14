@@ -74,9 +74,12 @@ class View:
         """Launch data download screen."""
         DataDownloadScreen(self)
 
-    def launch_data_view_screen(self) -> None:
-        """Launch data view screen."""
-        DataViewScreen(self)
+    def launch_main_screen(self) -> None:
+        """Launch main screen."""
+        MainScreen(self)
+
+    def launch_plan_comparison_screen(self) -> None:
+        PlanComparisonScreen(self)
 
 
 class LoginScreen:
@@ -151,7 +154,7 @@ class DataDownloadScreen:
         self._app = app
         self.tk_init()
         self._app.get_controller().download_data(
-            self._app.launch_data_view_screen, self.update_message
+            self._app.launch_main_screen, self.update_message
         )
 
     def tk_init(self) -> None:
@@ -171,8 +174,8 @@ class DataDownloadScreen:
         self._message.set(message)
 
 
-class DataViewScreen:
-    """Define the Data View screen."""
+class MainScreen:
+    """Define the main option selection/dashboard screen."""
 
     _app: View
 
@@ -182,14 +185,56 @@ class DataViewScreen:
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
-        self._app.set_title("Power Comparison: Analytics")
+        self._app.set_title("Power Comparison: Dashboard")
         window_root = self._app.new_frame()
         frame = ttk.Frame(window_root)
         frame.grid()
-        self._app.config_grid(frame, [1, 1], [1])
-        ttk.Label(frame, text="Data goes here").grid(row=0, column=0)
+        self._app.config_grid(frame, [1, 1], [1, 1])
         ttk.Button(
             frame,
-            text="Click for data",
+            text="Usage Data",
             command=self._app.get_controller().show_data,
-        ).grid(row=1, column=0)
+        ).grid(row=0, column=0)
+        ttk.Button(
+            frame,
+            text="Plan Comparison",
+            command=self._app.launch_plan_comparison_screen,
+        ).grid(row=0, column=1)
+        ttk.Button(frame, text="Exit", command=self._app.close_view).grid(
+            row=1, column=1
+        )
+
+
+class PlanComparisonScreen:
+    """Define the plan comparison and profile selection screen."""
+
+    _app: View
+    _selected_plan_set: ttk.Combobox
+
+    def __init__(self, app: View):
+        self._app = app
+        self.tk_init()
+
+    def tk_init(self) -> None:
+        """Initialize Tkinter for this screen."""
+        self._app.set_title("Power Comparison: ")
+        window_root = self._app.new_frame()
+        frame = ttk.Frame(window_root)
+        frame.grid()
+        self._app.config_grid(frame, [1], [2, 1])
+        self._selected_plan_set = ttk.Combobox(
+            frame, values=self._app.get_controller().get_profile_set_names()
+        )
+        self._selected_plan_set.grid(row=0, column=0)
+        ttk.Button(frame, text="Compare", command=self.compare_clicked).grid(
+            row=0, column=1
+        )
+
+    def compare_clicked(self) -> None:
+        """Event handler for compare being clicked."""
+        result = self._app.get_controller().show_comparison_data(
+            self._selected_plan_set.get()
+        )
+        if result is not None:
+            messagebox.showerror(title=result[0], message=result[1])
+            return

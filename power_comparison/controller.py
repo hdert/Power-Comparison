@@ -8,7 +8,7 @@ from datetime import date, timedelta
 from contact_energy_nz import AuthException
 from .connectors import Connectors
 from .connector import Connector
-from .data import Data
+from .data import Data, Profiles
 
 # Temporary
 import matplotlib.pyplot as plt
@@ -19,16 +19,22 @@ class Controller:
 
     _connector: Connector | None = None
     _data: Data
+    _profiles: Profiles
     _callback: Callable[[str], None] | None = None
     _username: str | None = None
 
-    def __init__(self, data: Data) -> None:
+    def __init__(self, data: Data, profiles: Profiles) -> None:
         """Initialize the controller."""
         self._data = data
+        self._profiles = profiles
 
     def get_connector_names(self) -> list[str]:
         """Return the names of the connectors."""
         return list(Connectors.get_names().keys())
+
+    def get_profile_set_names(self) -> list[str]:
+        """Return the names of the power plan profile sets."""
+        return self._profiles.get_profile_set_names()
 
     async def try_connect(
         self, connector_name: str, username: str, password: str
@@ -93,7 +99,8 @@ class Controller:
             )
         except asyncio.TimeoutError:
             if self._callback:
-                self._callback("Error: Downloading date timed out")
+                self._callback("Error: Downloading data timed out")
+            return
         if self._callback is not None:
             self._callback("Saving downloaded data")
         self._data.ingest_data(data)
@@ -108,7 +115,7 @@ class Controller:
 
     def show_data(self) -> None:
         """Show data in matplotlib displays."""
-        usage_data = self._data.get_usage_per_weekday()
+        usage_data = self._data.get_usage_per_hour()
         if usage_data is None:
             raise ValueError("No usage data found")
         x_axis = list(range(24))
@@ -121,5 +128,35 @@ class Controller:
         plt.bar(x_axis, usage_data)
         plt.show()
 
-    def show_comparison_data(self) -> None:
-        """Show comparison data in matplotlib display."""
+    def show_comparison_data(
+        self, plan_set_name: str
+    ) -> None | tuple[str, str]:
+        """Show comparison data in matplotlib display.
+
+        Returns None on success or error messages on failure.
+        """
+        if plan_set_name == "":
+            return (
+                "No Profile Set Selected",
+                "You haven't selected a set of plans to compare.",
+            )
+        if plan_set_name not in self._profiles.get_profile_set_names():
+            return (
+                "Invalid Profile Set Selected",
+                "You haven't selected a valid set of plans to compare.",
+            )
+        profile_data = self._profiles.get_profile_data(plan_set_name)
+        if profile_data is None:
+            return (
+                "Error Fetching Profile Set",
+                "We encountered an error fetching this profile set, \
+and it is not available for comparison at this time.",
+            )
+        usage_data = self._data.get_average_usage()
+        if usage_data is None:
+            return (
+                "Error Fetching Usage Data",
+                "This user doesn't have any usage data available.",
+            )
+        # TODO Do calculations, show data
+        return "WIP", "Work in progress."

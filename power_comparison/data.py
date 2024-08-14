@@ -124,6 +124,10 @@ class Data:
     ) -> list[list[float]] | None:
         """Get average of usage data for every hour of every weekday.
 
+        Returns None if there is no data for the user, else returns
+        a list (size seven, ordered by day) of lists
+        (size 24, ordered by hour) of floats.
+        Throws ValueError if initialize_user hasn't been called.
         start_date:
             Defaults to one year ago. The first date to include.
         end_date:
@@ -149,15 +153,16 @@ class Data:
             return None
         if len(data) != 7 * 24:
             print("WARNING: Data not right size.")
-        return [
-            [row[0] for row in data[i * 24 : (i + 1) * 24]] for i in range(7)
-        ]
+        return [[row[0] for row in data[i * 24 : (i + 1) * 24]] for i in range(7)]
 
-    def get_usage_per_weekday(
+    def get_usage_per_hour(
         self, start_date: date | None = None, end_date: date | None = None
     ) -> list[float] | None:
-        """Get average usage data per weekday.
+        """Get average usage data per hour.
 
+        Returns None if there is no data for the user, else returns
+        a list of 24 floats ordered by hour.
+        Throws ValueError if initialize_user hasn't been called.
         start_date:
             Defaults to one year ago. The first date to include.
         end_date:
@@ -195,11 +200,7 @@ class Profiles:
 
     def get_profile_set_names(self) -> list[str]:
         """Return a list of names of profile sets."""
-        return [
-            x.name
-            for x in Path(DVU.get_profiles_dir()).iterdir()
-            if x.is_dir()
-        ]
+        return [x.name for x in Path(DVU.get_profiles_dir()).iterdir() if x.is_dir()]
 
     def get_profile_data(self, profile: str) -> list[list[list[float]]] | None:
         """Return a list of profile data lists, or None if not valid path.
