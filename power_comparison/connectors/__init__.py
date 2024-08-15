@@ -1,7 +1,7 @@
 """Define an Enum of Connectors"""
 
 from enum import Enum
-from power_comparison.connector import Connector
+from .connector import Connector
 from .contact_energy_connector import ContactEnergyConnector
 
 

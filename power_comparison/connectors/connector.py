@@ -5,8 +5,6 @@ from collections.abc import Callable
 from typing import Self
 from datetime import date
 
-# from .config import Config
-
 
 class Connector(ABC):
     """The abstract class for an API Connector."""

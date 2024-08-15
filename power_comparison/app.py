@@ -1,8 +1,8 @@
 """App"""
 
-from .view import View
-from .controller import Controller
-from .data import Data, Profiles
+from view import View
+from controller import Controller
+from data import Data, Profiles
 
 
 class App:
@@ -12,3 +12,7 @@ class App:
         controller = Controller(data, profiles)
         View(controller)
         data.close()
+
+
+if __name__ == "__main__":
+    App()

@@ -6,7 +6,7 @@ from typing import Self
 from collections.abc import Callable
 from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
 import async_timeout
-from power_comparison.connector import Connector
+from connectors.connector import Connector
 
 # from power_comparison.config import Config
 

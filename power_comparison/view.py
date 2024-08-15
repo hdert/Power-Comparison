@@ -5,7 +5,7 @@ from tkinter import ttk
 import tkinter as tk
 import asyncio
 
-from .controller import Controller
+from controller import Controller
 
 
 class View:

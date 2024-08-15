@@ -4,7 +4,7 @@ import sqlite3
 import numpy as np
 import numpy.typing as npt
 from datetime import date, timedelta
-from .default_values_utility import DefaultValuesUtility as DVU
+from default_values_utility import DefaultValuesUtility as DVU
 from typing import Self
 from pathlib import Path
 

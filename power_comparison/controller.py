@@ -6,9 +6,9 @@ import asyncio
 from collections.abc import Callable
 from datetime import date, timedelta
 from contact_energy_nz import AuthException
-from .connectors import Connectors
-from .connector import Connector
-from .data import Data, Profiles
+from connectors import Connectors
+from connectors.connector import Connector
+from data import Data, Profiles
 
 # Temporary
 import matplotlib.pyplot as plt
@@ -175,6 +175,7 @@ and it is not available for comparison at this time.",
         x_axis = [p[0] for p in data]
         y_axis = [p[1] for p in data]
         axis = plt.subplot()
+        axis.set_title(f"Comparsion of power plans for {plan_set_name}")
         minor_y_ticks = range(0, int(y_axis[-1]), 100)
         major_y_ticks = range(0, int(y_axis[-1]), 200)
         axis.set_yticks(major_y_ticks)
@@ -182,7 +183,7 @@ and it is not available for comparison at this time.",
         axis.set_ylabel("Estimated cost of plan in a year")
         axis.set_xticks(range(len(x_axis)), labels=x_axis)
         axis.set_xticklabels(x_axis, rotation=25, ha="right")
-        axis.set_xlabel("Power Plan Comparison")
+        axis.set_xlabel("Power Plan")
         axis.grid(True, "both", "y")
         axis.grid(which="minor", alpha=0.3)
         axis.bar(x_axis, y_axis)
