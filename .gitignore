@@ -5,3 +5,5 @@ dev-environment/
 __pycache__/
 .venv/
 dist/
+.mypy_cache
+PowerComparison-UserData
