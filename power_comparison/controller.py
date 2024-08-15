@@ -64,10 +64,22 @@ class Controller:
             self._connector = await Connectors.get_names()[
                 connector_name
             ].create(username, password)
-        except (AuthException, asyncio.TimeoutError):
+        except AuthException:
             return (
                 "Invalid login",
                 "Your username/email and/or your password are incorrect.",
+            )
+        except asyncio.TimeoutError:
+            return (
+                "Timed out",
+                "Timed out trying to connect, \
+make sure your internet is working.",
+            )
+        except ValueError:
+            return (
+                "Error retrieving info",
+                "We encountered an error trying to retrieve your information, \
+please try again later.",
             )
         self._data.initialize_user(username)
         return None
@@ -145,18 +157,35 @@ class Controller:
                 "Invalid Profile Set Selected",
                 "You haven't selected a valid set of plans to compare.",
             )
-        profile_data = self._profiles.get_profile_data(plan_set_name)
-        if profile_data is None:
-            return (
-                "Error Fetching Profile Set",
-                "We encountered an error fetching this profile set, \
-and it is not available for comparison at this time.",
-            )
         usage_data = self._data.get_average_usage()
         if usage_data is None:
             return (
                 "Error Fetching Usage Data",
                 "This user doesn't have any usage data available.",
             )
-        # TODO Do calculations, show data
-        return "WIP", "Work in progress."
+        data = self._profiles.generate_plan_comparison(
+            usage_data, plan_set_name
+        )
+        if data is None:
+            return (
+                "Error Fetching Profile Set",
+                "We encountered an error fetching this profile set, \
+and it is not available for comparison at this time.",
+            )
+        x_axis = [p[0] for p in data]
+        y_axis = [p[1] for p in data]
+        axis = plt.subplot()
+        minor_y_ticks = range(0, int(y_axis[-1]), 100)
+        major_y_ticks = range(0, int(y_axis[-1]), 200)
+        axis.set_yticks(major_y_ticks)
+        axis.set_yticks(minor_y_ticks, minor=True)
+        axis.set_ylabel("Estimated cost of plan in a year")
+        axis.set_xticks(range(len(x_axis)), labels=x_axis)
+        axis.set_xticklabels(x_axis, rotation=25, ha="right")
+        axis.set_xlabel("Power Plan Comparison")
+        axis.grid(True, "both", "y")
+        axis.grid(which="minor", alpha=0.3)
+        axis.bar(x_axis, y_axis)
+        plt.subplots_adjust(bottom=0.2)
+        plt.show()
+        return None

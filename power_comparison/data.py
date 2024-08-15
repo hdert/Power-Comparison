@@ -2,6 +2,7 @@
 
 import sqlite3
 import numpy as np
+import numpy.typing as npt
 from datetime import date, timedelta
 from .default_values_utility import DefaultValuesUtility as DVU
 from typing import Self
@@ -124,7 +125,7 @@ class Data:
     ) -> list[list[float]] | None:
         """Get average of usage data for every hour of every weekday.
 
-        Returns None if there is no data for the user, else returns
+        Returns None if there is no or not enough data for the user, else returns
         a list (size seven, ordered by day) of lists
         (size 24, ordered by hour) of floats.
         Throws ValueError if initialize_user hasn't been called.
@@ -149,11 +150,12 @@ class Data:
             (self._user_id, start_date.toordinal(), end_date.toordinal()),
         )
         data = result.fetchall()
-        if len(data) == 0:
-            return None
         if len(data) != 7 * 24:
-            print("WARNING: Data not right size.")
-        return [[row[0] for row in data[i * 24 : (i + 1) * 24]] for i in range(7)]
+            # print("WARNING: Data not right size.")
+            return None
+        return [
+            [row[0] for row in data[i * 24 : (i + 1) * 24]] for i in range(7)
+        ]
 
     def get_usage_per_hour(
         self, start_date: date | None = None, end_date: date | None = None
@@ -200,27 +202,75 @@ class Profiles:
 
     def get_profile_set_names(self) -> list[str]:
         """Return a list of names of profile sets."""
-        return [x.name for x in Path(DVU.get_profiles_dir()).iterdir() if x.is_dir()]
+        return [
+            x.name
+            for x in Path(DVU.get_profiles_dir()).iterdir()
+            if x.is_dir()
+        ]
 
-    def get_profile_data(self, profile: str) -> list[list[list[float]]] | None:
-        """Return a list of profile data lists, or None if not valid path.
+    def _get_profile_data_numpy(
+        self, profile: str
+    ) -> list[tuple[str, float, npt.NDArray]] | None:
+        """Return a list of plan profiles, or None if profile not valid.
 
-        A profile data list is nested list of day, followed by hour.
-        A profile data list should be size (7,24)."""
+        Returns a profile data list of containing tuples of names,
+        daily charges, and numpy arrays of shape (7,24).
+        """
         data = []
         path = Path(DVU.get_profiles_dir()) / profile
         if not path.exists():
             return None
         for data_path in path.iterdir():
             if data_path.is_file():
+                # TODO Add daily charges
                 data.append(
-                    np.loadtxt(
-                        str(data_path),
-                        dtype=float,
-                        delimiter=",",
-                        skiprows=1,
-                        usecols=range(1, 25),
-                        max_rows=7,
-                    ).tolist()
+                    (
+                        data_path.stem,
+                        np.loadtxt(
+                            str(data_path),
+                            dtype=float,
+                            delimiter=",",
+                            skiprows=1,
+                            usecols=range(1, 25),
+                            max_rows=7,
+                        ),
+                    )
                 )
         return data
+
+    def get_profile_data(
+        self, profile: str
+    ) -> list[tuple[str, float, list[list[float]]]] | None:
+        """Return a list of plan profiles or None if profile not valid.
+
+        A plan profile is a tuple of it's name, daily charge, and
+        hour usage-based charges, all monetary values in cents.
+        A profile data list is nested list of day, followed by hour.
+        A profile data list should be size (7,24)."""
+        data = self._get_profile_data_numpy(profile)
+        return (
+            data
+            if data is None
+            else [(name, numbers.tolist()) for name, numbers in data]
+        )
+
+    def generate_plan_comparison(
+        self, usage: list[list[float]], profile: str
+    ) -> list[tuple[str, float]] | None:
+        """Returns sorted comparison name and cost for year.
+
+        Returns None if profile is not valid.
+        """
+        profile_data = self._get_profile_data_numpy(profile)
+        if profile_data is None:
+            return None
+        usage_np = np.array(usage, dtype=float)
+        result = [
+            (
+                name,
+                (usage_np * data).sum() * 365 / 7 / 100 + daily_charge * 365,
+            )
+            for name, daily_charge, data in profile_data
+        ]
+        result.sort(key=lambda x: x[1])
+        return result
