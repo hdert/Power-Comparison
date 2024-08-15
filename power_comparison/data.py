@@ -222,10 +222,18 @@ class Profiles:
             return None
         for data_path in path.iterdir():
             if data_path.is_file():
-                # TODO Add daily charges
                 data.append(
                     (
                         data_path.stem,
+                        float(
+                            np.loadtxt(
+                                str(data_path),
+                                dtype=float,
+                                delimiter=",",
+                                skiprows=8,
+                                usecols=1,
+                            )
+                        ),
                         np.loadtxt(
                             str(data_path),
                             dtype=float,
@@ -251,7 +259,10 @@ class Profiles:
         return (
             data
             if data is None
-            else [(name, numbers.tolist()) for name, numbers in data]
+            else [
+                (name, daily_charge, numbers.tolist())
+                for name, daily_charge, numbers in data
+            ]
         )
 
     def generate_plan_comparison(
@@ -268,7 +279,8 @@ class Profiles:
         result = [
             (
                 name,
-                (usage_np * data).sum() * 365 / 7 / 100 + daily_charge * 365,
+                (usage_np * data).sum() * ((365 / 100) / 7)
+                + daily_charge * (365 / 100),
             )
             for name, daily_charge, data in profile_data
         ]
