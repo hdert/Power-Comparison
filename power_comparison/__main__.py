@@ -1,6 +1,6 @@
 """Launch App when called from the command line."""
 
-from app import App
+from power_comparison.app import main
 
 if __name__ == "__main__":
-    App()
+    main()

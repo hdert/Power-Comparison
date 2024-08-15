@@ -1,8 +1,8 @@
 """App"""
 
-from view import View
-from controller import Controller
-from data import Data, Profiles
+from power_comparison.controller import Controller
+from power_comparison.data import Data, Profiles
+from power_comparison.view import View
 
 
 class App:
@@ -14,5 +14,10 @@ class App:
         data.close()
 
 
-if __name__ == "__main__":
+def main():
+    """Entry point for application."""
     App()
+
+
+if __name__ == "__main__":
+    main()

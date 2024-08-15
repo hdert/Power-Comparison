@@ -4,3 +4,4 @@ dev-environment/
 *.js
 __pycache__/
 .venv/
+dist/

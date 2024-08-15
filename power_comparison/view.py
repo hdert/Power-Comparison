@@ -1,11 +1,10 @@
 """A graphical application to interact with your power usage statistics."""
 
-from tkinter import Tk, messagebox
-from tkinter import ttk
-import tkinter as tk
 import asyncio
+import tkinter as tk
+from tkinter import Tk, messagebox, ttk
 
-from controller import Controller
+from power_comparison.controller import Controller
 
 
 class View:

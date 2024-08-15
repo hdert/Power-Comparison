@@ -1,9 +1,9 @@
 """Define the abstract class Connector."""
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Self
 from datetime import date
+from typing import Self
 
 
 class Connector(ABC):

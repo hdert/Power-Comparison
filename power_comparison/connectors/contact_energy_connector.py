@@ -1,12 +1,13 @@
 """Implement Connector for the Contact Energy API."""
 
 import asyncio
-from datetime import timedelta, date
-from typing import Self
 from collections.abc import Callable
-from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
+from datetime import date, timedelta
+from typing import Self
+
 import async_timeout
-from connectors.connector import Connector
+from power_comparison.connectors.connector import Connector
+from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
 
 # from power_comparison.config import Config
 

@@ -1,17 +1,15 @@
 """A graphical application to interact with your power usage statistics."""
 
 import asyncio
-
-# from .view import View
 from collections.abc import Callable
 from datetime import date, timedelta
-from contact_energy_nz import AuthException
-from connectors import Connectors
-from connectors.connector import Connector
-from data import Data, Profiles
 
-# Temporary
 import matplotlib.pyplot as plt
+from contact_energy_nz import AuthException
+
+from power_comparison.connectors import Connectors
+from power_comparison.connectors.connector import Connector
+from power_comparison.data import Data, Profiles
 
 
 class Controller:

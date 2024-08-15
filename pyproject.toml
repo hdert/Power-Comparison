@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "power-comparison"
+version = "0.1.0"
+authors = [{ name = "Justin Muirhead" }]
+description = "Application to compare power plan prices."
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+]
+dependencies = [
+    "contact-energy-nz>=0.1.10357010196",
+    "numpy",
+    "matplotlib",
+    "aiohttp",
+    "async-timeout",
+]
+requires-python = ">= 3.9"
+
+[project.urls]
+Repository = "https://github.com/hdert/Power-Comparison.git"
+Issues = "https://github.com/hdert/Power-Comparison/issues"
+
+[project.gui-scripts]
+power-comparison = "power_comparison.app:main"
+
+
+[tool.black]
+line-length = 79
