@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "power-comparison"
-version = "0.1.0"
+version = "0.1.1"
 authors = [{ name = "Justin Muirhead" }]
 description = "Application to compare power plan prices."
 readme = "README.md"
@@ -29,7 +29,6 @@ Issues = "https://github.com/hdert/Power-Comparison/issues"
 
 [project.gui-scripts]
 power-comparison = "power_comparison.app:main"
-
 
 [tool.black]
 line-length = 79
