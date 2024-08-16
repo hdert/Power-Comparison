@@ -1,14 +1,15 @@
 """Define the default values utility class."""
 
 from pathlib import Path
+import platformdirs
 
 
 class DefaultValuesUtility:
     """Define utility functions for default values."""
 
-    _PREFIX_DIR = "PowerComparison-UserData/"
     _PROFILES_DIR = "profiles"
     _DB_FILE_PATH = "data/user_data.db"
+    _APP_NAME = "Power Comparison"
 
     @staticmethod
     def create_dirs(dirpath: str, filepath: bool = False) -> None:
@@ -26,7 +27,11 @@ class DefaultValuesUtility:
     @staticmethod
     def get_db_file_path() -> str:
         """Return a path to the database file."""
-        return (
-            DefaultValuesUtility._PREFIX_DIR
-            + DefaultValuesUtility._DB_FILE_PATH
+        return str(
+            Path(
+                platformdirs.user_data_dir(
+                    DefaultValuesUtility._APP_NAME, roaming=True
+                )
+            )
+            / DefaultValuesUtility._DB_FILE_PATH
         )

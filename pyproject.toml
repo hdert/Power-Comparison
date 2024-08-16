@@ -20,6 +20,7 @@ dependencies = [
     "matplotlib",
     "aiohttp",
     "async-timeout",
+    "platformdirs",
 ]
 requires-python = ">= 3.9"
 
