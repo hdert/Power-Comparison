@@ -12,6 +12,7 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.figure import Figure
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
     from matplotlib.container import BarContainer
 
     from power_comparison.controller import Controller
@@ -237,8 +238,9 @@ class UsageViewScreen:
     """Define the usage view screen."""
 
     _app: View
-    _graph_frame: ttk.Frame
     _plot: BarContainer
+    _axes: Axes
+    _canvas: FigureCanvasTkAgg
     _start_date: tk.StringVar
     _end_date: tk.StringVar
 
@@ -270,9 +272,9 @@ class UsageViewScreen:
         )
         self._app.set_padding(frame, 5, 5)
         # Graph
-        self._graph_frame = ttk.Frame(window_root)
-        self._graph_frame.grid(row=0, column=1)
-        self.draw_plot()
+        graph_frame = ttk.Frame(window_root)
+        graph_frame.grid(row=0, column=1)
+        self.draw_plot(graph_frame)
         # Back Button
         back_frame = ttk.Frame(window_root)
         back_frame.grid(row=0, column=0, sticky="NW")
@@ -286,8 +288,6 @@ class UsageViewScreen:
         usage_data = self._app.get_controller().get_usage_data(
             self._start_date.get(), self._end_date.get()
         )
-        print(self._start_date.get())
-        print(usage_data)
         if isinstance(usage_data, tuple):
             messagebox.showerror(*usage_data)
             return
@@ -295,12 +295,13 @@ class UsageViewScreen:
             rect.set_height(count)
         self._axes.relim()
         self._axes.autoscale_view()
+        self._canvas.draw()
 
-    def draw_plot(self) -> None:
+    def draw_plot(self, frame: ttk.Frame) -> None:
         """Draw usage data plot."""
         # figure = Figure(figsize=(6, 4), dpi=100)
         figure = Figure(dpi=100)
-        canvas = FigureCanvasTkAgg(figure, self._graph_frame)
+        self._canvas = FigureCanvasTkAgg(figure, frame)
         self._axes = figure.add_subplot()
         x_axis = range(24)
         self._axes.set_xticks(x_axis)
@@ -309,7 +310,7 @@ class UsageViewScreen:
         self._axes.set_ylabel("Power Usage (KWh)")
         self._axes.grid(True, "both", "y")
         self._plot = self._axes.bar(x_axis, 24 * [0])
-        canvas.get_tk_widget().grid(row=0, column=0)
+        self._canvas.get_tk_widget().grid(row=0, column=0)
         self.update_plot()
 
 

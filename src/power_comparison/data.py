@@ -199,6 +199,8 @@ class Data:
             (self._user_id, start_date.toordinal(), end_date.toordinal()),
         )
         data = result.fetchall()
+        if len(data) == 0:
+            return None
         return [row[0] for row in data]
 
     def close(self) -> None:
