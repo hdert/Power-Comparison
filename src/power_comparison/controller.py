@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
@@ -128,6 +128,35 @@ please try again later.",
             return
         display_date = date.fromordinal(date_ordinal).strftime("%Y-%m-%d")
         self._callback(f"Retrieving usage data for date: {display_date}")
+
+    def get_last_date(self) -> date:
+        """Return default end date."""
+        result = self._data.get_last_date()
+        return date.today() if result is None else result
+
+    def get_start_date(self) -> date:
+        """Return default start date."""
+        last_date = self.get_last_date()
+        return (date.today() if last_date is None else last_date) - timedelta(
+            days=365
+        )
+
+    def get_usage_data(
+        self, start_date: str, end_date: str
+    ) -> list[float] | tuple[str, str]:
+        """Return Usage Data or Error title and message."""
+        try:
+            start = datetime.strptime(start_date, "%x").date()
+            end = datetime.strptime(end_date, "%x").date()
+        except ValueError:
+            return (
+                "Error parsing dates",
+                f"Your date's must be in the format: {date.today().strftime('%x')}",
+            )
+        result = self._data.get_usage_per_hour(start, end)
+        if result is None:
+            return "No Data", "Error no data was found for this range."
+        return result
 
     def show_data(self) -> None:
         """Show data in matplotlib displays."""
