@@ -16,11 +16,11 @@ classifiers = [
 ]
 dependencies = [
     "contact-energy-nz>=0.1.10357010196",
-    "numpy",
-    "matplotlib",
-    "aiohttp",
-    "async-timeout",
-    "platformdirs",
+    "numpy >= 2",
+    "matplotlib >= 3",
+    "aiohttp >= 3",
+    "async-timeout >= 4",
+    "platformdirs >= 4",
 ]
 requires-python = ">= 3.9"
 
