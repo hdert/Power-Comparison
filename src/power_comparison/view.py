@@ -22,9 +22,8 @@ class View:
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
         self._root.protocol("WM_DELETE_WINDOW", self.close_view)
-        LoginScreen(self)
-        task = asyncio.get_event_loop().create_task(self.exec(1 / 20))
-        asyncio.get_event_loop().run_until_complete(task)
+        self.launch_login_screen()
+        asyncio.get_event_loop().run_until_complete(self.exec(1 / 20))
 
     def close_view(self) -> None:
         """Close view."""
@@ -52,8 +51,14 @@ class View:
         """Configure the window title."""
         self._root.title(title)
 
+    def clear_screen(self) -> None:
+        """Clear the screen."""
+        for widget in self._root.winfo_children():
+            widget.destroy()
+
     def new_frame(self) -> ttk.Frame:
         """Return a new frame."""
+        self.clear_screen()
         frame = ttk.Frame(self._root)
         frame.grid(row=0, column=0, sticky="NEWS")
         self.config_grid(frame, [1], [1])
@@ -68,6 +73,10 @@ class View:
     def get_controller(self) -> Controller:
         """Return the controller."""
         return self._controller
+
+    def launch_login_screen(self) -> None:
+        """Launch the login screen."""
+        LoginScreen(self)
 
     def launch_data_download(self) -> None:
         """Launch data download screen."""
@@ -202,6 +211,10 @@ class MainScreen:
         ttk.Button(frame, text="Exit", command=self._app.close_view).grid(
             row=1, column=1
         )
+        ttk.Button(
+            frame, text="Logout", command=self._app.launch_login_screen
+        ).grid(row=1, column=0)
+        self._app.set_padding(frame, 5, 5)
 
 
 class PlanComparisonScreen:
@@ -228,6 +241,12 @@ class PlanComparisonScreen:
         ttk.Button(frame, text="Compare", command=self.compare_clicked).grid(
             row=0, column=1
         )
+        back_frame = ttk.Frame(window_root)
+        back_frame.grid(row=0, column=0, sticky="NW")
+        ttk.Button(
+            back_frame, text="Back", command=self._app.launch_main_screen
+        ).grid()
+        self._app.set_padding(back_frame, 5, 5)
 
     def compare_clicked(self) -> None:
         """Event handler for compare being clicked."""
