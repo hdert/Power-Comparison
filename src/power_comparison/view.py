@@ -308,7 +308,7 @@ class UsageViewScreen:
         self._axes.set_title("Average Power Usage Per Hour")
         self._axes.set_xlabel("Hour of day")
         self._axes.set_ylabel("Power Usage (KWh)")
-        self._axes.grid(True, "both", "y")
+        self._axes.grid(visible=True, which="both", axis="y")
         self._plot = self._axes.bar(x_axis, 24 * [0])
         self._canvas.get_tk_widget().grid(row=0, column=0)
         self.update_plot()

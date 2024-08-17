@@ -158,22 +158,6 @@ please try again later.",
             return "No Data", "Error no data was found for this range."
         return result
 
-    def show_data(self) -> None:
-        """Show data in matplotlib displays."""
-        usage_data = self._data.get_usage_per_hour()
-        if usage_data is None:
-            msg = "No usage data found"
-            raise ValueError(msg)
-        x_axis = list(range(24))
-        axes = plt.subplot()
-        axes.set_xticks(x_axis)
-        axes.set_title("Average Power Usage Per Hour")
-        axes.set_xlabel("Hour of day")
-        axes.set_ylabel("Power Usage in KWh")
-        axes.grid(True, "both", "y")
-        plt.bar(x_axis, usage_data)
-        plt.show()
-
     def show_comparison_data(
         self, plan_set_name: str
     ) -> None | tuple[str, str]:
