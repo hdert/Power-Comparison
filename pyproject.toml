@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "power-comparison"
-version = "0.1.2"
+dynamic = ["version"]
 authors = [{ name = "Justin Muirhead" }]
 description = "Application to compare power plan prices."
 readme = "README.md"
@@ -33,3 +33,6 @@ power-comparison = "power_comparison.app:main"
 
 [tool.black]
 line-length = 79
+
+[tool.hatch.version]
+source = "vcs"
