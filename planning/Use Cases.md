@@ -1,5 +1,11 @@
--   [ ] Graph plan pricing based on downloaded power usage
--   [ ] Download power usage from provider (contact only currently)
--   [ ] Update power usage from provider (contact only currently)
--   [ ] Be able to estimate plan pricing while tweaking per hour usage values
--   [ ] Download plan pricing automatically
+- [ ] Be able to estimate plan pricing while tweaking per hour usage values
+- [ ] Usage view
+  - [ ] Day to day
+  - [ ] Week to week
+  - [ ] Month to month
+- [ ] Date range for usage view and plan comparison view
+- [ ] Import usage from CSV
+- [x] Graph plan pricing based on downloaded power usage
+- [x] Download power usage from provider (contact only currently)
+- [x] Update power usage from provider (contact only currently)
+- [x] Download plan pricing automatically
