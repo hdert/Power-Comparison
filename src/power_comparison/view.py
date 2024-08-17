@@ -1,10 +1,13 @@
 """A graphical application to interact with your power usage statistics."""
+from __future__ import annotations
 
 import asyncio
 import tkinter as tk
 from tkinter import Tk, messagebox, ttk
+from typing import TYPE_CHECKING
 
-from power_comparison.controller import Controller
+if TYPE_CHECKING:
+    from power_comparison.controller import Controller
 
 
 class View:
@@ -86,7 +89,12 @@ class View:
         """Launch main screen."""
         MainScreen(self)
 
+    def launch_usage_view_screen(self) -> None:
+        """Launch usage view screen."""
+        UsageViewScreen(self)
+
     def launch_plan_comparison_screen(self) -> None:
+        """Launch plan comparison screen."""
         PlanComparisonScreen(self)
 
 
@@ -187,7 +195,8 @@ class MainScreen:
 
     _app: View
 
-    def __init__(self, app: View):
+    def __init__(self, app: View) -> None:
+        """Create MainScreen."""
         self._app = app
         self.tk_init()
 
@@ -201,7 +210,7 @@ class MainScreen:
         ttk.Button(
             frame,
             text="Usage Data",
-            command=self._app.get_controller().show_data,
+            command=self._app.launch_usage_view_screen,
         ).grid(row=0, column=0)
         ttk.Button(
             frame,
@@ -217,19 +226,50 @@ class MainScreen:
         self._app.set_padding(frame, 5, 5)
 
 
+class UsageViewScreen:
+    """Define the usage view screen."""
+
+    _app: View
+
+    def __init__(self, app: View) -> None:
+        """Create UsageViewScreen."""
+        self._app = app
+        self.tk_init()
+
+    def tk_init(self) -> None:
+        """Initialize Tkinter for this screen."""
+        self._app.set_title("Power Comparison: Usage View")
+        window_root = self._app.new_frame()
+        frame = ttk.Frame(window_root)
+        frame.grid()
+        self._app.config_grid(frame, [1], [1])
+        ttk.Button(
+            frame,
+            text="Usage Data",
+            command=self._app.get_controller().show_data,
+        ).grid(row=0, column=0)
+        back_frame = ttk.Frame(window_root)
+        back_frame.grid(row=0, column=0, sticky="NW")
+        ttk.Button(
+            back_frame, text="Back", command=self._app.launch_main_screen
+        ).grid()
+        self._app.set_padding(back_frame, 5, 5)
+
+
 class PlanComparisonScreen:
     """Define the plan comparison and profile selection screen."""
 
     _app: View
     _selected_plan_set: ttk.Combobox
 
-    def __init__(self, app: View):
+    def __init__(self, app: View) -> None:
+        """Create PlanComparisonScreen."""
         self._app = app
         self.tk_init()
 
     def tk_init(self) -> None:
         """Initialize Tkinter for this screen."""
-        self._app.set_title("Power Comparison: ")
+        self._app.set_title("Power Comparison: Plan Comparison")
         window_root = self._app.new_frame()
         frame = ttk.Frame(window_root)
         frame.grid()

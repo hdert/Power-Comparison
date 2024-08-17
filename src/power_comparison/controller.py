@@ -1,15 +1,20 @@
 """A graphical application to interact with your power usage statistics."""
+from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
 from datetime import date, timedelta
+from typing import TYPE_CHECKING
 
 import matplotlib.pyplot as plt
 from contact_energy_nz import AuthException
 
 from power_comparison.connectors import Connectors
-from power_comparison.connectors.connector import Connector
-from power_comparison.data import Data, Profiles
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from power_comparison.connectors.connector import Connector
+    from power_comparison.data import Data, Profiles
 
 
 class Controller:
@@ -98,7 +103,8 @@ please try again later.",
     ) -> None:
         """Call and await's connectors retrieve usage."""
         if self._connector is None:
-            raise ValueError("Controller._connector not set")
+            msg = "Controller._connector not set"
+            raise ValueError(msg)
         start_date = self._data.get_last_date()
         if start_date:
             start_date += timedelta(days=1)
@@ -127,7 +133,8 @@ please try again later.",
         """Show data in matplotlib displays."""
         usage_data = self._data.get_usage_per_hour()
         if usage_data is None:
-            raise ValueError("No usage data found")
+            msg = "No usage data found"
+            raise ValueError(msg)
         x_axis = list(range(24))
         axes = plt.subplot()
         axes.set_xticks(x_axis)

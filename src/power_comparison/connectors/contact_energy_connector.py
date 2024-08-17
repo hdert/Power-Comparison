@@ -1,15 +1,14 @@
 """Implement Connector for the Contact Energy API."""
+from __future__ import annotations
 
-import asyncio
 from collections.abc import Callable
 from datetime import date, timedelta
 from typing import Self
 
 import async_timeout
-from power_comparison.connectors.connector import Connector
-from contact_energy_nz import AuthException, ContactEnergyApi, UsageDatum
+from contact_energy_nz import ContactEnergyApi, UsageDatum
 
-# from power_comparison.config import Config
+from power_comparison.connectors.connector import Connector
 
 
 class ContactEnergyConnector(Connector):
@@ -36,15 +35,8 @@ class ContactEnergyConnector(Connector):
         self, username: str, password: str
     ) -> ContactEnergyApi:
         """Authenticate with the Contact API."""
-        try:
-            async with async_timeout.timeout(self._timeout):
-                return await ContactEnergyApi.from_credentials(
-                    username, password
-                )
-        except asyncio.TimeoutError as e:
-            raise e
-        except AuthException as e:
-            raise e
+        async with async_timeout.timeout(self._timeout):
+            return await ContactEnergyApi.from_credentials(username, password)
 
     async def retrieve_usage(
         self,
@@ -54,13 +46,18 @@ class ContactEnergyConnector(Connector):
     ) -> list[tuple[date, list[float]]]:
         """Retrieve usage data from the Connector's API.
 
-        start_date:
-            Default value is end_date - 365 days. Inclusive.
-        end_date:
-            Default value is today. Inclusive.
-        callback:
-            Default value is None. Callback accepts date ordinal for user
-            feedback while downloading data."""
+        Arguments:
+            start_date:
+                Default value is end_date - 365 days. Inclusive.
+            end_date:
+                Default value is today. Inclusive.
+            callback:
+                Default value is None. Callback accepts date ordinal for user
+                feedback while downloading data.
+
+        Throws:
+            asyncio.TimeoutError
+        """
         end_date = end_date if end_date else date.today()
         start_date = (
             start_date if start_date else end_date - timedelta(days=365)
@@ -71,17 +68,14 @@ class ContactEnergyConnector(Connector):
         while day >= start_date:
             if callback:
                 callback(day.toordinal())
-            try:
-                async with async_timeout.timeout(self._timeout):
-                    day_data = await self._connector.get_hourly_usage(day)
-                    if day_data is None or len(day_data) == 0:
-                        if valid_data:
-                            break
-                    else:
-                        data.append(day_data)
-                        valid_data = True
-            except asyncio.TimeoutError as e:
-                raise e
+            async with async_timeout.timeout(self._timeout):
+                day_data = await self._connector.get_hourly_usage(day)
+                if day_data is None or len(day_data) == 0:
+                    if valid_data:
+                        break
+                else:
+                    data.append(day_data)
+                    valid_data = True
             day -= timedelta(days=1)
         return [
             (

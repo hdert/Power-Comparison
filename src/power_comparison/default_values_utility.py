@@ -1,6 +1,7 @@
 """Define the default values utility class."""
 
 from pathlib import Path
+
 import platformdirs
 
 
@@ -12,12 +13,9 @@ class DefaultValuesUtility:
     _APP_NAME = "Power Comparison"
 
     @staticmethod
-    def create_dirs(dirpath: str, filepath: bool = False) -> None:
-        """Ensure all directories in dirpath are created."""
-        if filepath:
-            Path(dirpath).parent.mkdir(parents=True, exist_ok=True)
-        else:
-            Path(dirpath).mkdir(parents=True, exist_ok=True)
+    def create_dirs(filepath: str) -> None:
+        """Ensure all directories in filepath are created."""
+        Path(filepath).parent.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def get_profiles_dir() -> str:

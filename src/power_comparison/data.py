@@ -1,4 +1,5 @@
 """Define the Data class."""
+from __future__ import annotations
 
 import sqlite3
 from datetime import date, timedelta
@@ -23,7 +24,7 @@ class Data:
         To properly initialize with a user, call initialize_user().
         """
         db_filepath = DVU.get_db_file_path()
-        DVU.create_dirs(db_filepath, filepath=True)
+        DVU.create_dirs(db_filepath)
         self.connection = sqlite3.connect(db_filepath)
         self.cursor = self.connection.cursor()
         self.initialize_database()
@@ -92,7 +93,8 @@ class Data:
     def get_last_date(self) -> date | None:
         """Return usage data date, or None."""
         if self._user_id is None:
-            raise ValueError("Data: _user_id not set")
+            msg = "Data: _user_id not set"
+            raise ValueError(msg)
         result = self.cursor.execute(
             """SELECT date
             FROM usage_data
@@ -109,7 +111,8 @@ class Data:
     def ingest_data(self, data: list[tuple[date, list[float]]]) -> None:
         """Ingest data."""
         if self._user_id is None:
-            raise ValueError("Data: _user_id not set")
+            msg = "Data: _user_id not set"
+            raise ValueError(msg)
         for data_date, values in data:
             data_date_ord = data_date.toordinal()
             day = data_date.weekday()
@@ -127,16 +130,23 @@ class Data:
     ) -> list[list[float]] | None:
         """Get average of usage data for every hour of every weekday.
 
-        Returns None if there is no or not enough data for the user, else returns
-        a list (size seven, ordered by day) of lists
-        (size 24, ordered by hour) of floats.
-        Throws ValueError if initialize_user hasn't been called.
-        start_date:
-            Defaults to one year ago. The first date to include.
-        end_date:
-            Defaults to today. The last date to include."""
+        Returns:
+            None if there is no or not enough data for the user, else returns
+            a list (size seven, ordered by day) of lists
+            (size 24, ordered by hour) of floats.
+
+        Args:
+            start_date:
+                Defaults to one year ago. The first date to include.
+            end_date:
+                Defaults to today. The last date to include.
+
+        Raises:
+            ValueError if initialize_user hasn't been called.
+        """
         if self._user_id is None:
-            raise ValueError("Data: _user_id not set")
+            msg = "Data: _user_id not set"
+            raise ValueError(msg)
         if end_date is None:
             end_date = date.today()
         if start_date is None:
@@ -153,7 +163,6 @@ class Data:
         )
         data = result.fetchall()
         if len(data) != 7 * 24:
-            # print("WARNING: Data not right size.")
             return None
         return [
             [row[0] for row in data[i * 24 : (i + 1) * 24]] for i in range(7)
@@ -170,9 +179,11 @@ class Data:
         start_date:
             Defaults to one year ago. The first date to include.
         end_date:
-            Defaults to today. The last date to include."""
+        Defaults to today. The last date to include.
+        """
         if self._user_id is None:
-            raise ValueError("Data: _user_id not set")
+            msg = "Data: _user_id not set"
+            raise ValueError(msg)
         if end_date is None:
             end_date = date.today()
         if start_date is None:
@@ -218,35 +229,33 @@ class Profiles:
         Returns a profile data list of containing tuples of names,
         daily charges, and numpy arrays of shape (7,24).
         """
-        data = []
         path = Path(DVU.get_profiles_dir()) / profile
         if not path.exists():
             return None
-        for data_path in path.iterdir():
-            if data_path.is_file():
-                data.append(
-                    (
-                        data_path.stem,
-                        float(
-                            np.loadtxt(
-                                str(data_path),
-                                dtype=float,
-                                delimiter=",",
-                                skiprows=8,
-                                usecols=1,
-                            )
-                        ),
-                        np.loadtxt(
-                            str(data_path),
-                            dtype=float,
-                            delimiter=",",
-                            skiprows=1,
-                            usecols=range(1, 25),
-                            max_rows=7,
-                        ),
+        return [
+            (
+                data_path.stem,
+                float(
+                    np.loadtxt(
+                        str(data_path),
+                        dtype=float,
+                        delimiter=",",
+                        skiprows=8,
+                        usecols=1,
                     )
-                )
-        return data
+                ),
+                np.loadtxt(
+                    str(data_path),
+                    dtype=float,
+                    delimiter=",",
+                    skiprows=1,
+                    usecols=range(1, 25),
+                    max_rows=7,
+                ),
+            )
+            for data_path in path.iterdir()
+            if data_path.is_file()
+        ]
 
     def get_profile_data(
         self, profile: str
@@ -256,7 +265,8 @@ class Profiles:
         A plan profile is a tuple of it's name, daily charge, and
         hour usage-based charges, all monetary values in cents.
         A profile data list is nested list of day, followed by hour.
-        A profile data list should be size (7,24)."""
+        A profile data list should be size (7,24).
+        """
         data = self._get_profile_data_numpy(profile)
         return (
             data

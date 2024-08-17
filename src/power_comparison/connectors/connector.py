@@ -1,9 +1,12 @@
 """Define the abstract class Connector."""
+from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable
-from datetime import date
-from typing import Self
+from typing import TYPE_CHECKING, Self
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from datetime import date
 
 
 class Connector(ABC):
