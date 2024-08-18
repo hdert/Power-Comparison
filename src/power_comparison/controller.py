@@ -150,7 +150,7 @@ please try again later.",
         except ValueError:
             return (
                 "Error parsing dates",
-                f"Your date's must be in the format: {date.today().strftime('%x')}",
+                f"Your dates must be in the format: {date.today().strftime('%x')}",
             )
         result = self._data.get_usage_per_hour(start, end)
         if result is None:
@@ -180,14 +180,11 @@ please try again later.",
         except ValueError:
             return (
                 "Error parsing dates",
-                f"Your date's must be in the format: {date.today().strftime('%x')}",
+                f"Your dates must be in the format: {date.today().strftime('%x')}",
             )
         usage_data = self._data.get_average_usage(start, end)
         if usage_data is None:
-            return (
-                "Error Fetching Usage Data",
-                "This user doesn't have any usage data available.",
-            )
+            return "No Data", "Error no data was found for this range."
         data = self._profiles.generate_plan_comparison(
             usage_data, plan_set_name
         )

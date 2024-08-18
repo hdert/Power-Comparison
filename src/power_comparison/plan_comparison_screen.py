@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import tkinter as tk
+from textwrap import wrap
 from tkinter import messagebox, ttk
 from typing import TYPE_CHECKING
 
@@ -37,7 +38,7 @@ class PlanComparisonScreen:
         frame.grid(row=0, column=0)
         self._app.config_grid(frame, [1, 1, 1, 1], [1, 1])
         # Plan Selection
-        ttk.Label(frame, text="Select group of plans").grid(
+        ttk.Label(frame, text="Select group of plans:").grid(
             row=0, column=0, sticky="E"
         )
         self._selected_plan_set = ttk.Combobox(
@@ -83,27 +84,29 @@ class PlanComparisonScreen:
             return
         self._figure.clear()
         axes = self._figure.add_subplot()
-        x_axis = [p[0] for p in result]
-        y_axis = [p[1] for p in result]
+        y_axis = [p[0] for p in result]
+        x_axis = [p[1] for p in result]
         axes.set_title(
             f"Comparison of power plans for {self._selected_plan_set.get()}"
         )
-        minor_y_ticks = range(0, int(y_axis[-1]), 100)
-        major_y_ticks = range(0, int(y_axis[-1]), 200)
-        axes.set_ylabel("Estimated cost of plan in a year")
-        axes.set_yticks(major_y_ticks)
-        axes.set_yticks(minor_y_ticks, minor=True)
-        axes.grid(visible=True, which="both", axis="y")
+        minor_x_ticks = range(0, int(x_axis[-1]), 100)
+        major_x_ticks = range(0, int(x_axis[-1]), 200)
+        axes.set_xlabel("Estimated cost of plan in a year ($)")
+        axes.set_xticks(major_x_ticks)
+        axes.tick_params(axis="x", labelrotation=90)
+        axes.set_xticks(minor_x_ticks, minor=True)
+        axes.grid(visible=True, which="both", axis="x")
         axes.grid(which="minor", alpha=0.3)
-        axes.set_xlabel("Power Plan")
-        axes.set_xticks(range(len(x_axis)), labels=x_axis)
-        axes.set_xticklabels(x_axis, rotation=25, ha="right")
-        axes.bar(x_axis, y_axis)
+        axes.set_ylabel("Power Plan")
+        y_axis = ["\n".join(wrap(l, 20)) for l in y_axis]
+        axes.set_yticks(range(len(y_axis)), labels=y_axis)
+        axes.set_yticklabels(y_axis)
+        axes.barh(y_axis, x_axis)
         self._canvas.draw()
 
     def draw_plot(self, frame: ttk.Frame) -> None:
         """Draw comparison plot."""
-        self._figure = Figure(dpi=100)
+        self._figure = Figure(figsize=(8, 6), dpi=100)
         self._canvas = FigureCanvasTkAgg(self._figure, frame)
-        self._figure.subplots_adjust(bottom=0.2)
+        self._figure.subplots_adjust(left=0.2)
         self._canvas.get_tk_widget().grid(row=0, column=0)

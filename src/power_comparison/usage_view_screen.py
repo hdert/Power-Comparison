@@ -82,7 +82,6 @@ class UsageViewScreen:
 
     def draw_plot(self, frame: ttk.Frame) -> None:
         """Draw usage data plot."""
-        # figure = Figure(figsize=(6, 4), dpi=100)
         figure = Figure(dpi=100)
         self._canvas = FigureCanvasTkAgg(figure, frame)
         self._axes = figure.add_subplot()
