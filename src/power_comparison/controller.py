@@ -5,7 +5,6 @@ import asyncio
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING
 
-import matplotlib.pyplot as plt
 from contact_energy_nz import AuthException
 
 from power_comparison.connectors import Connectors
@@ -158,9 +157,9 @@ please try again later.",
             return "No Data", "Error no data was found for this range."
         return result
 
-    def show_comparison_data(
-        self, plan_set_name: str
-    ) -> None | tuple[str, str]:
+    def get_comparison_data(
+        self, plan_set_name: str, start_date: str, end_date: str
+    ) -> list[tuple[str, float]] | tuple[str, str]:
         """Show comparison data in matplotlib display.
 
         Returns None on success or error messages on failure.
@@ -175,7 +174,15 @@ please try again later.",
                 "Invalid Profile Set Selected",
                 "You haven't selected a valid set of plans to compare.",
             )
-        usage_data = self._data.get_average_usage()
+        try:
+            start = datetime.strptime(start_date, "%x").date()
+            end = datetime.strptime(end_date, "%x").date()
+        except ValueError:
+            return (
+                "Error parsing dates",
+                f"Your date's must be in the format: {date.today().strftime('%x')}",
+            )
+        usage_data = self._data.get_average_usage(start, end)
         if usage_data is None:
             return (
                 "Error Fetching Usage Data",
@@ -190,21 +197,4 @@ please try again later.",
                 "We encountered an error fetching this profile set, \
 and it is not available for comparison at this time.",
             )
-        x_axis = [p[0] for p in data]
-        y_axis = [p[1] for p in data]
-        axis = plt.subplot()
-        axis.set_title(f"Comparsion of power plans for {plan_set_name}")
-        minor_y_ticks = range(0, int(y_axis[-1]), 100)
-        major_y_ticks = range(0, int(y_axis[-1]), 200)
-        axis.set_yticks(major_y_ticks)
-        axis.set_yticks(minor_y_ticks, minor=True)
-        axis.set_ylabel("Estimated cost of plan in a year")
-        axis.set_xticks(range(len(x_axis)), labels=x_axis)
-        axis.set_xticklabels(x_axis, rotation=25, ha="right")
-        axis.set_xlabel("Power Plan")
-        axis.grid(True, "both", "y")
-        axis.grid(which="minor", alpha=0.3)
-        axis.bar(x_axis, y_axis)
-        plt.subplots_adjust(bottom=0.2)
-        plt.show()
-        return None
+        return data

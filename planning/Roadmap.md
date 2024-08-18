@@ -3,9 +3,10 @@
   - [ ] Day to day
   - [ ] Week to week
   - [ ] Month to month
-- [ ] Date range for usage view and plan comparison view
 - [ ] Import usage from CSV
 - [ ] Make graph labels hover-over
+- [x] Date range for usage view and plan comparison view
+- [x] Split view.py into separate files
 - [x] Graph plan pricing based on downloaded power usage
 - [x] Download power usage from provider (contact only currently)
 - [x] Update power usage from provider (contact only currently)
