@@ -6,8 +6,10 @@ from datetime import date, timedelta
 from typing import Self
 
 import async_timeout
+import contact_energy_nz
 from contact_energy_nz import ContactEnergyApi, UsageDatum
 
+from power_comparison.connectors import connector
 from power_comparison.connectors.connector import Connector
 
 
@@ -23,10 +25,20 @@ class ContactEnergyConnector(Connector):
     async def create(
         cls, username: str, password: str, timeout: int = 60
     ) -> Self:
-        """Initialize the ContactEnergyConnector."""
+        """Initialize the ContactEnergyConnector.
+
+        Raises:
+            AuthException:
+                username and/or password incorrect.
+            ValueError:
+                Something else has gone wrong.
+        """
         self = cls()
         self._timeout = timeout
-        self._connector = await self._authenticate(username, password)
+        try:
+            self._connector = await self._authenticate(username, password)
+        except contact_energy_nz.AuthException as e:
+            raise connector.AuthException from e
         self._token = self._connector.token
         await self._connector.account_summary()
         return self

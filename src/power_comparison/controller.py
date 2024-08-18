@@ -5,9 +5,8 @@ import asyncio
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING
 
-from contact_energy_nz import AuthException
-
 from power_comparison.connectors import Connectors
+from power_comparison.connectors.connector import AuthException
 
 if TYPE_CHECKING:
     from collections.abc import Callable

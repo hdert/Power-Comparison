@@ -39,3 +39,7 @@ source = "vcs"
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.pyright]
+venv = ".venv"
+venvPath = "."
