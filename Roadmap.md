@@ -1,10 +1,11 @@
-- [ ] Be able to estimate plan pricing while tweaking per hour usage values
+- [ ] Fix graph labels
+  - [ ] Make a scrolling legend
 - [ ] Usage view
   - [ ] Day to day
   - [ ] Week to week
   - [ ] Month to month
 - [ ] Import usage from CSV
-- [ ] Make graph labels hover-over
+- [ ] Be able to estimate plan pricing while tweaking per hour usage values
 - [x] Date range for usage view and plan comparison view
 - [x] Split view.py into separate files
 - [x] Graph plan pricing based on downloaded power usage

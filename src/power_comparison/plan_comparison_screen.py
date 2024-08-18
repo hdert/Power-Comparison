@@ -64,7 +64,7 @@ class PlanComparisonScreen:
         graph_frame = ttk.Frame(window_root)
         graph_frame.grid(row=0, column=1, sticky="NESW")
         self._app.config_grid(graph_frame, [1], [1])
-        self.draw_plot(graph_frame)
+        self.setup_plot(graph_frame)
         # Back Button
         back_frame = ttk.Frame(window_root)
         back_frame.grid(row=0, column=0, sticky="NW")
@@ -105,8 +105,8 @@ class PlanComparisonScreen:
         axes.barh(y_axis, x_axis)
         self._canvas.draw()
 
-    def draw_plot(self, frame: ttk.Frame) -> None:
-        """Draw comparison plot."""
+    def setup_plot(self, frame: ttk.Frame) -> None:
+        """Setup comparison plot."""
         self._figure = Figure()
         self._canvas = FigureCanvasTkAgg(self._figure, frame)
         self._figure.subplots_adjust(left=0.2)
