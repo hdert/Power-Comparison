@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import asyncio
-import tkinter as tk
-from tkinter import PhotoImage, Tk, messagebox, ttk
+from tkinter import PhotoImage
 from typing import TYPE_CHECKING
+
+import customtkinter as ctk
+from CTkMessagebox import CTkMessagebox
 
 from power_comparison.plan_comparison_screen import PlanComparisonScreen
 from power_comparison.usage_view_screen import UsageViewScreen
@@ -16,14 +18,14 @@ if TYPE_CHECKING:
 class View:
     """A graphical application to interact with your power usage statistics."""
 
-    _root: Tk
+    _root: ctk.CTk
     _controller: Controller
-    _closed: bool = False
+    _close: bool = False
 
     def __init__(self, controller: Controller) -> None:
         """Initialize the App."""
         self._controller = controller
-        self._root = Tk()
+        self._root = ctk.CTk()
         self._root.minsize(width=1280, height=720)
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
@@ -35,19 +37,19 @@ class View:
 
     def close_view(self) -> None:
         """Close view."""
-        self._root.destroy()
-        self._closed = True
+        self._close = True
 
     async def exec(self, interval: float) -> None:
         """Execute view."""
         while True:
-            if self._closed:
+            if self._close:
+                self._root.destroy()
                 break
             self._root.update()
             await asyncio.sleep(interval)
 
     def config_grid(
-        self, frame: ttk.Frame, rows: list[int], columns: list[int]
+        self, frame: ctk.CTkFrame, rows: list[int], columns: list[int]
     ) -> None:
         """Configure the amount of rows and columns on the root."""
         for i, weight in enumerate(rows):
@@ -64,7 +66,7 @@ class View:
         for widget in self._root.winfo_children():
             widget.destroy()
 
-    def new_frame(self) -> ttk.Frame:
+    def new_frame(self) -> ctk.CTkFrame:
         """Return a new frame.
 
         This returns a new 'root'-like frame for a new window.
@@ -72,12 +74,12 @@ class View:
         one row and column.
         """
         self.clear_screen()
-        frame = ttk.Frame(self._root)
+        frame = ctk.CTkFrame(self._root)
         frame.grid(row=0, column=0, sticky="NEWS")
         self.config_grid(frame, [1], [1])
         return frame
 
-    def set_padding(self, frame: ttk.Frame, padx: int, pady: int) -> None:
+    def set_padding(self, frame: ctk.CTkFrame, padx: int, pady: int) -> None:
         """Set the padding of all children in a frame."""
         for child in frame.winfo_children():
             child.grid(padx=padx, pady=pady)
@@ -111,9 +113,9 @@ class LoginScreen:
     """Define the Login or Registration selection screen."""
 
     _app: View
-    _selected_connector: ttk.Combobox
-    _username: tk.StringVar
-    _password: tk.StringVar
+    _selected_connector: ctk.CTkComboBox
+    _username: ctk.StringVar
+    _password: ctk.StringVar
 
     def __init__(self, app: View) -> None:
         """Create LoginScreen."""
@@ -124,32 +126,32 @@ class LoginScreen:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Login")
         window_root = self._app.new_frame()
-        frame = ttk.Frame(window_root)
+        frame = ctk.CTkFrame(window_root)
         frame.grid()
         self._app.config_grid(frame, [1, 1, 1, 1], [1, 2])
-        ttk.Label(frame, text="Power Company:").grid(
+        ctk.CTkLabel(frame, text="Power Company:").grid(
             row=0, column=0, sticky="E"
         )
-        self._selected_connector = ttk.Combobox(
+        self._selected_connector = ctk.CTkComboBox(
             frame,
             values=self._app.get_controller().get_connector_names(),
         )
         self._selected_connector.grid(row=0, column=1)
-        ttk.Label(frame, text="Username/Email:").grid(
+        ctk.CTkLabel(frame, text="Username/Email:").grid(
             row=1, column=0, sticky="E"
         )
-        self._username = tk.StringVar()
-        ttk.Entry(frame, textvariable=self._username).grid(row=1, column=1)
-        ttk.Label(frame, text="Password:").grid(row=2, column=0, sticky="E")
-        self._password = tk.StringVar()
-        password_entry = ttk.Entry(
+        self._username = ctk.StringVar()
+        ctk.CTkEntry(frame, textvariable=self._username).grid(row=1, column=1)
+        ctk.CTkLabel(frame, text="Password:").grid(row=2, column=0, sticky="E")
+        self._password = ctk.StringVar()
+        password_entry = ctk.CTkEntry(
             frame, show="•", textvariable=self._password
         )
         password_entry.grid(row=2, column=1)
         password_entry.bind(
             "<Return>", lambda _: asyncio.create_task(self.next_clicked())
         )
-        self._next_button = ttk.Button(
+        self._next_button = ctk.CTkButton(
             frame,
             text="Login",
             command=lambda: asyncio.create_task(self.next_clicked()),
@@ -159,15 +161,15 @@ class LoginScreen:
 
     async def next_clicked(self) -> None:
         """Event handler for the next button being clicked."""
-        self._next_button.config(state="disabled")
+        self._next_button.configure(state="disabled")
         result = await self._app.get_controller().try_connect(
             self._selected_connector.get(),
             self._username.get(),
             self._password.get(),
         )
         if result is not None:
-            messagebox.showerror(title=result[0], message=result[1])
-            self._next_button.config(state="normal")
+            CTkMessagebox(title=result[0], message=result[1], icon="cancel")
+            self._next_button.configure(state="normal")
             return
         self._app.launch_data_download()
 
@@ -176,7 +178,7 @@ class DataDownloadScreen:
     """Define the Data Download screen."""
 
     _app: View
-    _message: tk.StringVar
+    _message: ctk.StringVar
 
     def __init__(self, app: View) -> None:
         """Create DataDownloadScreen."""
@@ -190,12 +192,12 @@ class DataDownloadScreen:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Downloading Data")
         window_root = self._app.new_frame()
-        frame = ttk.Frame(window_root)
+        frame = ctk.CTkFrame(window_root)
         frame.grid()
         self._app.config_grid(frame, [1], [1])
-        self._message = tk.StringVar()
+        self._message = ctk.StringVar()
         self._message.set("Downloading data")
-        ttk.Label(frame, textvariable=self._message).grid(row=0, column=0)
+        ctk.CTkLabel(frame, textvariable=self._message).grid(row=0, column=0)
         self._app.set_padding(frame, 5, 5)
 
     def update_message(self, message: str) -> None:
@@ -217,23 +219,23 @@ class MainScreen:
         """Initialize Tkinter for this screen."""
         self._app.set_title("Power Comparison: Dashboard")
         window_root = self._app.new_frame()
-        frame = ttk.Frame(window_root)
+        frame = ctk.CTkFrame(window_root)
         frame.grid()
         self._app.config_grid(frame, [1, 1], [1, 1])
-        ttk.Button(
+        ctk.CTkButton(
             frame,
             text="Usage Data",
             command=self._app.launch_usage_view_screen,
         ).grid(row=0, column=0)
-        ttk.Button(
+        ctk.CTkButton(
             frame,
             text="Plan Comparison",
             command=self._app.launch_plan_comparison_screen,
         ).grid(row=0, column=1)
-        ttk.Button(frame, text="Exit", command=self._app.close_view).grid(
+        ctk.CTkButton(frame, text="Exit", command=self._app.close_view).grid(
             row=1, column=1
         )
-        ttk.Button(
+        ctk.CTkButton(
             frame, text="Logout", command=self._app.launch_login_screen
         ).grid(row=1, column=0)
         self._app.set_padding(frame, 5, 5)
