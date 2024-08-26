@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from textwrap import wrap
 from typing import TYPE_CHECKING
 
 import customtkinter as ctk
@@ -20,6 +19,7 @@ class PlanComparisonScreen:
 
     _app: View
     _selected_plan_set: ctk.CTkOptionMenu
+    _legend_frame: ctk.CTkScrollableFrame
     _figure: Figure
     _canvas: FigureCanvasTkAgg
     _start_date: StringVar
@@ -36,7 +36,7 @@ class PlanComparisonScreen:
         window_root = self._app.new_frame()
         self._app.config_grid(window_root, [1], [1, 4])
         left_frame = ctk.CTkFrame(window_root)
-        left_frame.grid(row=0, column=0)
+        left_frame.grid(row=0, column=0, sticky="NEWS")
         self._app.config_grid(left_frame, [1, 2], [1])
         frame = ctk.CTkFrame(left_frame)
         frame.grid(row=0, column=0)
@@ -73,6 +73,21 @@ class PlanComparisonScreen:
         graph_frame.grid(row=0, column=1, sticky="NESW")
         self._app.config_grid(graph_frame, [1], [1])
         self.setup_plot(graph_frame)
+        # Legend
+        self._legend_frame = ctk.CTkScrollableFrame(left_frame)
+        self._legend_frame.grid(row=1, column=0, sticky="NESW")
+        self._legend_frame.bind_all(
+            "<Button-4>",
+            lambda _: self._legend_frame._parent_canvas.yview(
+                "scroll", -1, "units"
+            ),
+        )
+        self._legend_frame.bind_all(
+            "<Button-5>",
+            lambda _: self._legend_frame._parent_canvas.yview(
+                "scroll", 1, "units"
+            ),
+        )
         # Back Button
         back_frame = ctk.CTkFrame(window_root)
         back_frame.grid(row=0, column=0, sticky="NW")
@@ -93,7 +108,7 @@ class PlanComparisonScreen:
             return
         self._figure.clear()
         axes = self._figure.add_subplot()
-        y_axis = [p[0] for p in result]
+        y_axis = [str(i) for i in range(1, len(result) + 1)]
         x_axis = [p[1] for p in result]
         axes.set_title(
             f"Comparison of power plans for {self._selected_plan_set.get()}"
@@ -108,11 +123,28 @@ class PlanComparisonScreen:
         axes.grid(which="minor", alpha=0.3)
         axes.set_ylabel("Power Plan")
         axes.yaxis.set_inverted(True)
-        y_axis = ["\n".join(wrap(label, 20)) for label in y_axis]
         axes.set_yticks(range(len(y_axis)), labels=y_axis)
         axes.set_yticklabels(y_axis)
         axes.barh(y_axis, x_axis)
         self._canvas.draw()
+        self.update_legend(result)
+
+    def update_legend(self, info: list[tuple[str, float]]) -> None:
+        """Update the legend with power plan information.
+
+        Args:
+            info: A list of power plan names, and estimated prices.
+        """
+        for widget in self._legend_frame.winfo_children():
+            widget.destroy()
+        for i, (name, value) in enumerate(info):
+            ctk.CTkLabel(
+                self._legend_frame,
+                text=f"#{i + 1:<2} {name}",
+            ).grid(row=i, column=0, sticky="W")
+            ctk.CTkLabel(self._legend_frame, text=f"${value:.2f}").grid(
+                row=i, column=1, sticky="E", padx=5
+            )
 
     def setup_plot(self, frame: ctk.CTkFrame) -> None:
         """Setup comparison plot."""
