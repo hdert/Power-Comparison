@@ -65,12 +65,16 @@ class View:
             widget.destroy()
 
     def new_frame(self) -> ttk.Frame:
-        """Return a new frame."""
+        """Return a new frame.
+
+        This returns a new 'root'-like frame for a new window.
+        It also clears the screen, and configures this frame to have
+        one row and column.
+        """
         self.clear_screen()
         frame = ttk.Frame(self._root)
         frame.grid(row=0, column=0, sticky="NEWS")
         self.config_grid(frame, [1], [1])
-        frame.tkraise()
         return frame
 
     def set_padding(self, frame: ttk.Frame, padx: int, pady: int) -> None:
