@@ -113,7 +113,7 @@ class LoginScreen:
     """Define the Login or Registration selection screen."""
 
     _app: View
-    _selected_connector: ctk.CTkComboBox
+    _selected_connector: ctk.CTkOptionMenu
     _username: ctk.StringVar
     _password: ctk.StringVar
 
@@ -132,7 +132,7 @@ class LoginScreen:
         ctk.CTkLabel(frame, text="Power Company:").grid(
             row=0, column=0, sticky="E"
         )
-        self._selected_connector = ctk.CTkComboBox(
+        self._selected_connector = ctk.CTkOptionMenu(
             frame,
             values=self._app.get_controller().get_connector_names(),
         )

@@ -19,7 +19,7 @@ class PlanComparisonScreen:
     """Define the plan comparison and profile selection screen."""
 
     _app: View
-    _selected_plan_set: ctk.CTkComboBox
+    _selected_plan_set: ctk.CTkOptionMenu
     _figure: Figure
     _canvas: FigureCanvasTkAgg
     _start_date: StringVar
@@ -45,7 +45,7 @@ class PlanComparisonScreen:
         ctk.CTkLabel(frame, text="Select group of plans:").grid(
             row=0, column=0, sticky="E"
         )
-        self._selected_plan_set = ctk.CTkComboBox(
+        self._selected_plan_set = ctk.CTkOptionMenu(
             frame, values=self._app.get_controller().get_profile_set_names()
         )
         self._selected_plan_set.grid(row=0, column=1)
