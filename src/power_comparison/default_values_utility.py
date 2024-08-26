@@ -11,6 +11,7 @@ class DefaultValuesUtility:
     _PROFILES_DIR = "profiles"
     _DB_FILE_PATH = "data/user_data.db"
     _APP_NAME = "Power Comparison"
+    _ICON_PATH = "img/power_compare.png"
 
     @staticmethod
     def create_dirs(filepath: str) -> None:
@@ -21,6 +22,11 @@ class DefaultValuesUtility:
     def get_profiles_dir() -> str:
         """Return a path to the profiles directory."""
         return str(Path(__file__).parent / DefaultValuesUtility._PROFILES_DIR)
+
+    @staticmethod
+    def get_icon_png_path() -> str:
+        """Return a path to the program's icon."""
+        return str(Path(__file__).parent / DefaultValuesUtility._ICON_PATH)
 
     @staticmethod
     def get_db_file_path() -> str:

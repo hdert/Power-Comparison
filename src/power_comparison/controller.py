@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from power_comparison.connectors import Connectors
 from power_comparison.connectors.connector import AuthException
+from power_comparison.default_values_utility import DefaultValuesUtility as DVU
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -28,6 +29,10 @@ class Controller:
         """Initialize the controller."""
         self._data = data
         self._profiles = profiles
+
+    def get_icon_path(self) -> str:
+        """Return the path to the app's icon."""
+        return DVU.get_icon_png_path()
 
     def get_connector_names(self) -> list[str]:
         """Return the names of the connectors."""

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import tkinter as tk
-from tkinter import Tk, messagebox, ttk
+from tkinter import PhotoImage, Tk, messagebox, ttk
 from typing import TYPE_CHECKING
 
 from power_comparison.plan_comparison_screen import PlanComparisonScreen
@@ -28,6 +28,8 @@ class View:
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
         self._root.protocol("WM_DELETE_WINDOW", self.close_view)
+        icon = PhotoImage(file=self.get_controller().get_icon_path())
+        self._root.iconphoto(True, icon)
         self.launch_login_screen()
         asyncio.get_event_loop().run_until_complete(self.exec(1 / 20))
 
