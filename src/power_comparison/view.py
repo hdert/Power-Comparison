@@ -136,8 +136,12 @@ class LoginScreen:
         ttk.Entry(frame, textvariable=self._username).grid(row=1, column=1)
         ttk.Label(frame, text="Password:").grid(row=2, column=0, sticky="E")
         self._password = tk.StringVar()
-        ttk.Entry(frame, show="•", textvariable=self._password).grid(
-            row=2, column=1
+        password_entry = ttk.Entry(
+            frame, show="•", textvariable=self._password
+        )
+        password_entry.grid(row=2, column=1)
+        password_entry.bind(
+            "<Return>", lambda _: asyncio.create_task(self.next_clicked())
         )
         self._next_button = ttk.Button(
             frame,
