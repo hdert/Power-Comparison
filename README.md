@@ -49,7 +49,7 @@ Contributions in the areas of power plan pricing data, and power retailer usage 
 
 ## Developing
 
-Simply install [`hatch`](https://pypi.org/projects/hatch) with:
+Simply install [`hatch`](https://pypi.org/project/hatch) with:
 
 ```sh
 pip install hatch
