@@ -6,8 +6,8 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/pypi/v/power-comparison.svg">
-    <img src="https://img.shields.io/pypi/l/power-comparison.svg">
+    <a href="https://pypi.org/project/power-comparison"><img src="https://img.shields.io/pypi/v/power-comparison.svg"></a>
+    <a href="https://github.com/hdert/Power-Comparison/blob/main/LICENSE"><img src="https://img.shields.io/pypi/l/power-comparison.svg"></a>
 </p>
 
 # Table of Contents
