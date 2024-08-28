@@ -34,6 +34,7 @@ class View:
         self._root.rowconfigure(0, weight=1)
         self._root.columnconfigure(0, weight=1)
         self._root.protocol("WM_DELETE_WINDOW", self.close_view)
+        self._root.iconbitmap()
         icon = PhotoImage(file=self.get_controller().get_icon_path())
         self._root.iconphoto(True, icon)
         self._theme = ctk.get_appearance_mode()
