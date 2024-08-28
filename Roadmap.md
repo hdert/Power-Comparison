@@ -6,6 +6,7 @@
   - [ ] Month to month
 - [ ] Import usage from CSV
 - [ ] Be able to estimate plan pricing while tweaking per hour usage values
+- [ ] Palette: #f5f5ed, #d0d046, #ffff59, #262624
 - [x] Date range for usage view and plan comparison view
 - [x] Split view.py into separate files
 - [x] Graph plan pricing based on downloaded power usage

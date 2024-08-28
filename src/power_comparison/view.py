@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 
+from power_comparison.default_values_utility import DefaultValuesUtility
 from power_comparison.plan_comparison_screen import PlanComparisonScreen
 from power_comparison.usage_view_screen import UsageViewScreen
 
@@ -27,6 +28,7 @@ class View:
     def __init__(self, controller: Controller) -> None:
         """Initialize the App."""
         self._controller = controller
+        ctk.set_default_color_theme(DefaultValuesUtility.get_theme_path())
         self._root = ctk.CTk()
         self._root.minsize(width=1280, height=720)
         self._root.rowconfigure(0, weight=1)

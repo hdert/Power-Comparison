@@ -13,6 +13,7 @@ class DefaultValuesUtility:
     _APP_NAME = "Power Comparison"
     _ICON_ICO_PATH = "img/power_compare.ico"
     _ICON_PNG_PATH = "img/power_compare.png"
+    _THEME_PATH = "theme/pc-yellow.json"
 
     @staticmethod
     def create_dirs(filepath: str) -> None:
@@ -33,6 +34,11 @@ class DefaultValuesUtility:
     def get_icon_png_path() -> str:
         """Return a path to the program's icon."""
         return str(Path(__file__).parent / DefaultValuesUtility._ICON_PNG_PATH)
+
+    @staticmethod
+    def get_theme_path() -> str:
+        """Return the path to the main theme."""
+        return str(Path(__file__).parent / DefaultValuesUtility._THEME_PATH)
 
     @staticmethod
     def get_db_file_path() -> str:
