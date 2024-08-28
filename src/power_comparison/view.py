@@ -21,6 +21,8 @@ class View:
     _root: ctk.CTk
     _controller: Controller
     _close: bool = False
+    _theme: str
+    _theme_text: ctk.StringVar
 
     def __init__(self, controller: Controller) -> None:
         """Initialize the App."""
@@ -32,6 +34,9 @@ class View:
         self._root.protocol("WM_DELETE_WINDOW", self.close_view)
         icon = PhotoImage(file=self.get_controller().get_icon_path())
         self._root.iconphoto(True, icon)
+        self._theme = ctk.get_appearance_mode()
+        self._theme_text = ctk.StringVar()
+        self.update_theme_text()
         self.launch_login_screen()
         asyncio.get_event_loop().run_until_complete(self.exec(1 / 20))
 
@@ -87,6 +92,26 @@ class View:
     def get_controller(self) -> Controller:
         """Return the controller."""
         return self._controller
+
+    def update_theme_text(self) -> None:
+        """Update internal theme text StringVar."""
+        if self._theme == "Dark":
+            self._theme_text.set("☀️")
+        else:
+            self._theme_text.set("🌙")
+
+    def get_theme_text(self) -> ctk.StringVar:
+        """Return internal theme text StringVar."""
+        return self._theme_text
+
+    def switch_theme(self) -> None:
+        """Change the application theme."""
+        if self._theme == "Dark":
+            self._theme = "Light"
+        else:
+            self._theme = "Dark"
+        ctk.set_appearance_mode(self._theme)
+        self.update_theme_text()
 
     def launch_login_screen(self) -> None:
         """Launch the login screen."""
@@ -158,6 +183,18 @@ class LoginScreen:
         )
         self._next_button.grid(row=3, column=1, sticky="E")
         self._app.set_padding(frame, 5, 5)
+
+        # Appearance Switch Button
+
+        switch_frame = ctk.CTkFrame(window_root)
+        switch_frame.grid(row=0, column=0, sticky="NE")
+        ctk.CTkButton(
+            switch_frame,
+            textvariable=self._app.get_theme_text(),
+            width=28,
+            command=self._app.switch_theme,
+        )
+        self._app.set_padding(switch_frame, 5, 5)
 
     async def next_clicked(self) -> None:
         """Event handler for the next button being clicked."""
