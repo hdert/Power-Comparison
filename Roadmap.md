@@ -1,5 +1,3 @@
-- [ ] Fix graph labels
-  - [ ] Make a scrolling legend
 - [ ] Usage view
   - [ ] Day to day
   - [ ] Week to week
@@ -7,6 +5,9 @@
 - [ ] Import usage from CSV
 - [ ] Be able to estimate plan pricing while tweaking per hour usage values
 - [ ] Palette: #f5f5ed, #d0d046, #ffff59, #262624
+- [ ] Proper icons for darkmode/lightmode toggle
+- [x] Fix graph labels
+  - [x] Make a scrolling legend
 - [x] Date range for usage view and plan comparison view
 - [x] Split view.py into separate files
 - [x] Graph plan pricing based on downloaded power usage

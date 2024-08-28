@@ -116,6 +116,18 @@ class View:
         ctk.set_appearance_mode(self._theme)
         self.update_theme_text()
 
+    def appearance_switch_button(self, frame: ctk.CTkFrame) -> None:
+        """Add an appearance switch button to frame."""
+        switch_frame = ctk.CTkFrame(frame)
+        switch_frame.grid(row=0, column=0, sticky="NE")
+        ctk.CTkButton(
+            switch_frame,
+            textvariable=self.get_theme_text(),
+            width=28,
+            command=self.switch_theme,
+        )
+        self.set_padding(switch_frame, 5, 5)
+
     def launch_login_screen(self) -> None:
         """Launch the login screen."""
         LoginScreen(self)
@@ -187,17 +199,7 @@ class LoginScreen:
         self._next_button.grid(row=3, column=1, sticky="E")
         self._app.set_padding(frame, 5, 5)
 
-        # Appearance Switch Button
-
-        switch_frame = ctk.CTkFrame(window_root)
-        switch_frame.grid(row=0, column=0, sticky="NE")
-        ctk.CTkButton(
-            switch_frame,
-            textvariable=self._app.get_theme_text(),
-            width=28,
-            command=self._app.switch_theme,
-        )
-        self._app.set_padding(switch_frame, 5, 5)
+        self._app.appearance_switch_button(window_root)
 
     async def next_clicked(self) -> None:
         """Event handler for the next button being clicked."""
@@ -279,3 +281,5 @@ class MainScreen:
             frame, text="Logout", command=self._app.launch_login_screen
         ).grid(row=1, column=0)
         self._app.set_padding(frame, 5, 5)
+
+        self._app.appearance_switch_button(window_root)
