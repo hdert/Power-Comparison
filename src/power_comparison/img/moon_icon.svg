@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100"
+   height="100"
+   viewBox="0 0 26.458333 26.458333"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   sodipodi:docname="moon_icon.svg"
+   inkscape:export-filename="moon_icon.png"
+   inkscape:export-xdpi="100"
+   inkscape:export-ydpi="100"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.7699357"
+     inkscape:cx="68.954669"
+     inkscape:cy="86.283591"
+     inkscape:window-width="791"
+     inkscape:window-height="864"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path1"
+       style="fill:#ffff59;fill-opacity:1;stroke:#ffff59;stroke-width:1.32291667;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:7.70457;stroke-opacity:1"
+       d="M 10.768657,0.62970222 A 13.126022,12.766947 0 0 0 0.64726357,13.026606 13.126022,12.766947 0 0 0 13.773286,25.793553 13.126022,12.766947 0 0 0 25.861018,17.943875 11.813419,11.490252 0 0 1 19.711273,19.625521 11.813419,11.490252 0 0 1 7.8978523,8.1352702 11.813419,11.490252 0 0 1 10.768657,0.62970222 Z" />
+  </g>
+</svg>

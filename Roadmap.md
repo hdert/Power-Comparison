@@ -6,6 +6,10 @@
 - [ ] Be able to estimate plan pricing while tweaking per hour usage values
 - [ ] Palette: #f5f5ed, #d0d046, #ffff59, #262624
 - [ ] Proper icons for darkmode/lightmode toggle
+- [ ] Make app more asthetic
+  - [ ] Login screen
+  - [ ] Graphs
+  - [ ] Frames
 - [x] Fix graph labels
   - [x] Make a scrolling legend
 - [x] Date range for usage view and plan comparison view

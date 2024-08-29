@@ -34,6 +34,18 @@ class Controller:
         """Return the path to the app's icon."""
         return DVU.get_icon_png_path()
 
+    def get_lightmode_icon_path(self) -> str:
+        """Return the path to the lightmode icon."""
+        return DVU.get_lightmode_icon_path()
+
+    def get_darkmode_icon_path(self) -> str:
+        """Return the path to the darkmode icon."""
+        return DVU.get_darkmode_icon_path()
+
+    def get_theme_path(self) -> str:
+        """Return the path to the theme file."""
+        return DVU.get_theme_path()
+
     def get_connector_names(self) -> list[str]:
         """Return the names of the connectors."""
         return list(Connectors.get_names().keys())

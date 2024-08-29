@@ -14,6 +14,8 @@ class DefaultValuesUtility:
     _ICON_ICO_PATH = "img/power_compare.ico"
     _ICON_PNG_PATH = "img/power_compare.png"
     _THEME_PATH = "theme/pc-yellow.json"
+    _MOON_ICON_PATH = "img/moon_icon.png"
+    _SUN_ICON_PATH = "img/sun_icon.png"
 
     @staticmethod
     def create_dirs(filepath: str) -> None:
@@ -39,6 +41,18 @@ class DefaultValuesUtility:
     def get_theme_path() -> str:
         """Return the path to the main theme."""
         return str(Path(__file__).parent / DefaultValuesUtility._THEME_PATH)
+
+    @staticmethod
+    def get_darkmode_icon_path() -> str:
+        """Return the path to the darkmode icon."""
+        return str(
+            Path(__file__).parent / DefaultValuesUtility._MOON_ICON_PATH
+        )
+
+    @staticmethod
+    def get_lightmode_icon_path() -> str:
+        """Return the path to the lightmode icon."""
+        return str(Path(__file__).parent / DefaultValuesUtility._SUN_ICON_PATH)
 
     @staticmethod
     def get_db_file_path() -> str:

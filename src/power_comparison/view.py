@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
+from PIL import Image
 
-from power_comparison.default_values_utility import DefaultValuesUtility
 from power_comparison.plan_comparison_screen import PlanComparisonScreen
 from power_comparison.usage_view_screen import UsageViewScreen
 
@@ -23,12 +23,11 @@ class View:
     _controller: Controller
     _close: bool = False
     _theme: str
-    _theme_text: ctk.StringVar
 
     def __init__(self, controller: Controller) -> None:
         """Initialize the App."""
         self._controller = controller
-        ctk.set_default_color_theme(DefaultValuesUtility.get_theme_path())
+        ctk.set_default_color_theme(controller.get_theme_path())
         self._root = ctk.CTk()
         self._root.minsize(width=1280, height=720)
         self._root.rowconfigure(0, weight=1)
@@ -39,7 +38,6 @@ class View:
         self._root.iconphoto(True, icon)
         self._theme = ctk.get_appearance_mode()
         self._theme_text = ctk.StringVar()
-        self.update_theme_text()
         self.launch_login_screen()
         asyncio.get_event_loop().run_until_complete(self.exec(1 / 20))
 
@@ -96,17 +94,6 @@ class View:
         """Return the controller."""
         return self._controller
 
-    def update_theme_text(self) -> None:
-        """Update internal theme text StringVar."""
-        if self._theme == "Dark":
-            self._theme_text.set("☀️")
-        else:
-            self._theme_text.set("🌙")
-
-    def get_theme_text(self) -> ctk.StringVar:
-        """Return internal theme text StringVar."""
-        return self._theme_text
-
     def switch_theme(self) -> None:
         """Change the application theme."""
         if self._theme == "Dark":
@@ -114,17 +101,28 @@ class View:
         else:
             self._theme = "Dark"
         ctk.set_appearance_mode(self._theme)
-        self.update_theme_text()
 
     def appearance_switch_button(self, frame: ctk.CTkFrame) -> None:
         """Add an appearance switch button to frame."""
         switch_frame = ctk.CTkFrame(frame)
         switch_frame.grid(row=0, column=0, sticky="NE")
+        image = ctk.CTkImage(
+            light_image=Image.open(
+                self.get_controller().get_darkmode_icon_path()
+            ),
+            dark_image=Image.open(
+                self.get_controller().get_lightmode_icon_path()
+            ),
+        )
         ctk.CTkButton(
             switch_frame,
-            textvariable=self.get_theme_text(),
             width=28,
+            height=28,
+            image=image,
+            text="",
             command=self.switch_theme,
+            fg_color=("#363634", "#262624"),
+            hover_color=("#464644", "#363634"),
         )
         self.set_padding(switch_frame, 5, 5)
 
