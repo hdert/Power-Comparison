@@ -9,7 +9,8 @@ from customtkinter import StringVar
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg,
 )
-from matplotlib.figure import Figure
+
+from power_comparison.tkinter_figure import new_figure
 
 if TYPE_CHECKING:
     from matplotlib.axes import Axes
@@ -89,8 +90,11 @@ class UsageViewScreen:
 
     def draw_plot(self, frame: ctk.CTkFrame) -> None:
         """Draw usage data plot."""
-        figure = Figure(dpi=100)
-        self._canvas = FigureCanvasTkAgg(figure, frame)
+        figure, self._canvas = new_figure(
+            frame,
+            self._app.get_background_color(),
+            self._app.get_foreground_color(),
+        )
         self._axes = figure.add_subplot()
         x_axis = range(24)
         self._axes.set_xticks(x_axis)

@@ -94,6 +94,18 @@ class View:
         """Return the controller."""
         return self._controller
 
+    def get_background_color(self) -> str:
+        """Return the background color."""
+        if self._theme == "Dark":
+            return "#262624"
+        return "#f5f5ed"
+
+    def get_foreground_color(self) -> str:
+        """Return the foreground color."""
+        if self._theme == "Dark":
+            return "#f5f5ed"
+        return "#262624"
+
     def switch_theme(self) -> None:
         """Change the application theme."""
         if self._theme == "Dark":

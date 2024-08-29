@@ -10,6 +10,8 @@ from customtkinter import StringVar
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
+from power_comparison.tkinter_figure import new_figure
+
 if TYPE_CHECKING:
     from power_comparison.view import View
 
@@ -148,7 +150,10 @@ class PlanComparisonScreen:
 
     def setup_plot(self, frame: ctk.CTkFrame) -> None:
         """Setup comparison plot."""
-        self._figure = Figure()
-        self._canvas = FigureCanvasTkAgg(self._figure, frame)
+        self._figure, self._canvas = new_figure(
+            frame,
+            self._app.get_background_color(),
+            self._app.get_foreground_color(),
+        )
         self._figure.subplots_adjust(left=0.2)
         self._canvas.get_tk_widget().grid(row=0, column=0, sticky="NESW")
