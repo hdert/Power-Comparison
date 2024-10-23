@@ -23,6 +23,7 @@ dependencies = [
     "platformdirs >= 4",
     "customtkinter >= 5",
     "CTkMessagebox >= 2",
+    "pillow >= 10",
 ]
 requires-python = ">= 3.9"
 

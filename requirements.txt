@@ -3,3 +3,7 @@ numpy
 matplotlib
 aiohttp
 async-timeout
+platformdirs
+customtkinter
+CTkMessagebox
+pillow
